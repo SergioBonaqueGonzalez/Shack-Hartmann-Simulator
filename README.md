@@ -11,7 +11,10 @@ www.linkedin.com/in/sergiobonaque
 I am open to include any request or any contribution.
 
 
-The input is a vector of zernike coefficients in Noll notation and the output is coefficients recovered using a shack-hartmann sensor. In its actual state, it can be used, for example, to test centroid algorithms or new methodology.I hope in the near future will be a very complete simulator.
+- The input is a phase represented as a vector of zernike coefficients in the Noll notation 
+- The output is a vector of recovered Zernike coefficients 
+
+In its actual state, it can be used, for example, to test centroid algorithms or new methodology.I hope in the near future will be a very complete simulator.
 At the moment it is a shack-Hartmann simulator which includes the following features;
 Customization of:
 
@@ -25,9 +28,14 @@ Customization of:
     
     Focal of microlenses.
     
-Include the option of consider propagation between microlenses array and CCD. The script automatically calcules if Fresnel or Fraunhofer aproximation is necessary.
-Cuantization.
-It calculates a variety of quality metrics as PSF, MTF, Sthrel ratio, Convolution with an extended object and analisys of residual error.
+    Include the option of consider propagation between microlenses array and CCD. 
+    
+    The script automatically calcules if Fresnel or Fraunhofer aproximation is necessary.
+    
+    Cuantization of CCD signal.
+    
+    It calculates a variety of quality metrics as PSF, MTF, Sthrel ratio, Convolution with an extended object and analisys of residual error.
+    
 First, it will calculate and store the recuperation matrix for a certain configuration. This step could take a few minutes. If the configuration is changed, this must be done again.
 
 
@@ -41,31 +49,35 @@ To Do:
 - For testing purposes, in this moment the script only allows to use configurations of pixel and number of microlenses which allow a simmetric distribution of microlesenses and pupil. Now it can be removed, but it is something to do.
 - Include separation between microlenses
 
-Syntax:
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-[ZerRecuperados]=SimAb(modos,c,resolucion,TamPixel,LAMBDA,NLentes,focalML,Propagacion,factor,bits,pintar)
+SYNTAX: The simulator is called as a function of the form:
 
-modos= zernike modes (ej. modos=10)
+* [ZerRecuperados]=SimAb(modos,c,resolucion,TamPixel,LAMBDA,NLentes,focalML,Propagacion,factor,bits,pintar)
 
-c = vector with the zernike coefficients in Noll notation (ej. c=rand(10,1)
+where:
 
-resolucion= resolution of CCD (only square and odd CCDs are considered) (ej. 1024)
+    modos= how many zernike modes will be considered (ej. modos=10)
 
-TamPixel=Tamaño del pixel en la CCD (ej. 1.471e-6)
+    c = vector with the zernike coefficients in Noll notation (ej. c=rand(10,1)
 
-LAMBDA= Wavelength in microns (ej. 0.780)
+    resolucion= resolution of CCD (only square and odd CCDs are considered) (ej. 1024)
 
-NLentes= Number of microlenses in a row (it is supposed square microlenses array (ej.41))
+    TamPixel= Pixe size of the CCD in meters (ej. 1.471e-6)
 
-focalML= Microlenses focal in meters.
+    LAMBDA= Wavelength in microns (ej. 0.780)
 
-Propagacion= Flag that indicates if propagation between microlenses and CCD should be taken into account: =0 no propagation =1 propagation
+    NLentes= Number of microlenses in a row (it is supposed square microlenses array (ej.41))
 
-factor= The value of zernike coeficients used for characterization of the sensor. ej=1e-8
+    focalML= focal length of microlenses  in meters.
 
-bits= bits used for quantization of CCD
+    Propagacion= Flag that indicates if propagation between microlenses and CCD should be taken into account: 0=NO ; 1=YES
 
-pintar= Flag which indicates if figures should be painted or not 1=yes, 2=no
+    factor= The value of zernike coeficients in meters used for characterization of the sensor. ej=1e-8
+
+    bits= bits used for quantization of CCD
+
+    pintar= Flag which indicates if all figures should be painted or not 0=NO ; 1= YES
 
 
 Example of use:
