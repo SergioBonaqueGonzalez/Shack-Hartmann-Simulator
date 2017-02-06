@@ -71,6 +71,9 @@ pintar= Flag which indicates if figures should be painted or not 1=yes, 2=no
 Example of use:
 
 modos=36;
+
 c(1:15)=rand(15,1);
+
 c(16:modos)=0.1*rand(length(16:modos),1);
+
 [ZerRecuperados]=SimAb(modos,c,2025,1.471e-6,0.780,41,1e-3,0,1e-8,16,0);
