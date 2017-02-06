@@ -1,8 +1,12 @@
 # Shack-Hartmann-Simulator in MATLAB
 
+
 This program was created by Sergio Bonaque-Gonzalez
 sergio.bonaque@um.es
 www.linkedin.com/in/sergiobonaque
+
+
+I am open to include any request.
 
 
 This script is open to contributions. I hope in the near future will be a very complete simulator.
@@ -16,6 +20,10 @@ Customization of:
 Include the option of consider propagation between microlenses array and CCD. The script automatically calcules if Fresnel or Fraunhofer aproximation is necessary
 Cuantization 
 It calculates a variety of quality metrics as PSF, MTF, Sthrel ratio, Convolution with an extended object and analisys of residual error.
+First, it will calculate and store the recuperation matrix for a certain configuration. This step could take a few minutes. If the configuration is changed, this must be done again.
+
+
+
 
 To Do:
 - I like to program in a very easy-to-understand way. However it is not computationally optimal.
