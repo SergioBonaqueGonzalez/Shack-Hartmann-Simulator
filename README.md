@@ -8,10 +8,10 @@ sergio.bonaque@um.es
 www.linkedin.com/in/sergiobonaque
 
 
-I am open to include any request.
+I am open to include any request or any contribution.
 
 
-This script is open to contributions. I hope in the near future will be a very complete simulator.
+The input is a vector of zernike coefficients in Noll notation and the output is coefficients recovered using a shack-hartmann sensor. In its actual state, it can be used, for example, to test centroid algorithms or new methodology.I hope in the near future will be a very complete simulator.
 At the moment it is a shack-Hartmann simulator which includes the following features;
 Customization of:
 
