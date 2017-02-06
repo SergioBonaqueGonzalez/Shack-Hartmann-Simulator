@@ -1,7 +1,5 @@
 function [VectorZernikes] = ObtenerMatrizZernikes(TamPixel,focalML,Propagacion,lambda,k,MicroLentesMascara,radioMLpxs,CoorBuenas,PupilaML,NFresnel,CentroideReferencia,Escala,modos,ZerModo,Eliminadas,longitud,factor,bits)
 
-Paralelo=parpool('CAFADIS',20);
-
 %Funcion que calcula cada modo de zernike visto a traves del aberrometro
 VectorZernikes=zeros(longitud,modos);
 PSFmax=zeros(1,modos);
@@ -13,7 +11,7 @@ parfor w=1:modos;
     PadLente=cell(1,length(CoorBuenas));%Prealoco los arrays
     
     for i=1:length(CoorBuenas)
-        Lente{i}=WFSubpupil(CoorBuenas(i,1):CoorBuenas(i,2), CoorBuenas(i,3):CoorBuenas(i,4));%Separo el frente de onda que "ve" cada microlente. Está en metros
+        Lente{i}=WFSubpupil(CoorBuenas(i,1):CoorBuenas(i,2), CoorBuenas(i,3):CoorBuenas(i,4));%Separo el frente de onda que "ve" cada microlente. EstÃ¡ en metros
         PadLente{i}=zeros(radioMLpxs*Escala);%Creo una matriz mas grande (escala/2 veces el radio)
         %PadLente{i}(((radioMLpxs*Escala)/2)-radioMLpxs+0.5:end+radioMLpxs-((radioMLpxs*Escala)/2)-0.5,((radioMLpxs*Escala)/2)-radioMLpxs+0.5:end+radioMLpxs-((radioMLpxs*Escala)/2)-0.5)= Lente{i};%Meto la lente en una matriz el doble de grande para eliminar efectos de borde
         PadLente{i}(radioMLpxs*2+1:end-radioMLpxs*2,radioMLpxs*2+1:end-radioMLpxs*2)= Lente{i};%Meto la lente en una matriz el doble de grande para eliminar efectos de borde
@@ -30,7 +28,7 @@ parfor w=1:modos;
         end
     else %SUPONIENDO PROPAGACION ENTRE MICROLENTE Y CCD
         [~,a]=size(PadLente{1});
-        L=a*TamPixel;%Tamaño del lado de cada region considerada
+        L=a*TamPixel;%TamaÃ±o del lado de cada region considerada
         if NFresnel> 0.5 && NFresnel<1;
             PSF=cell(1,length(PadLente));
             PSFmaxLocal=zeros(1,length(PadLente));
@@ -74,7 +72,7 @@ parfor w=1:modos;
     Lente=cell(1,length(CoorBuenas));%Prealoco los arrays
     PadLente=cell(1,length(CoorBuenas));%Prealoco los arrays
     for i=1:length(CoorBuenas)
-        Lente{i}=WFSubpupil(CoorBuenas(i,1):CoorBuenas(i,2), CoorBuenas(i,3):CoorBuenas(i,4));%Separo el frente de onda que "ve" cada microlente. Está en metros
+        Lente{i}=WFSubpupil(CoorBuenas(i,1):CoorBuenas(i,2), CoorBuenas(i,3):CoorBuenas(i,4));%Separo el frente de onda que "ve" cada microlente. EstÃ¡ en metros
         PadLente{i}=zeros(radioMLpxs*Escala);%Creo una matriz mas grande (escala/2 veces el radio)
         %PadLente{i}(((radioMLpxs*Escala)/2)-radioMLpxs+0.5:end+radioMLpxs-((radioMLpxs*Escala)/2)-0.5,((radioMLpxs*Escala)/2)-radioMLpxs+0.5:end+radioMLpxs-((radioMLpxs*Escala)/2)-0.5)= Lente{i};%Meto la lente en una matriz el doble de grande para eliminar efectos de borde
         PadLente{i}(radioMLpxs*2+1:end-radioMLpxs*2,radioMLpxs*2+1:end-radioMLpxs*2)= Lente{i};%Meto la lente en una matriz el doble de grande para eliminar efectos de borde
@@ -89,7 +87,7 @@ parfor w=1:modos;
         end
     else %SUPONIENDO PROPAGACION ENTRE MICROLENTE Y CCD
         [~,a]=size(PadLente{1});
-        L=a*TamPixel;%Tamaño del lado de cada region considerada
+        L=a*TamPixel;%TamaÃ±o del lado de cada region considerada
         if NFresnel> 0.5 && NFresnel<1;
             PSF=cell(1,length(PadLente));
             for i=1:length(PadLente)
@@ -141,7 +139,7 @@ parfor w=1:modos;
         CoorCentroide(i,2)=CentroideReferencia(i,3)+LongitudCentroide(i,2);
     end
     
-    deltas=double(LongitudCentroide*TamPixel); %Estos deltas estan muy discretizados segun el número de pixeles.
+    deltas=double(LongitudCentroide*TamPixel); %Estos deltas estan muy discretizados segun el nÃºmero de pixeles.
     
     alfax= double(atan(deltas(:,1)/focalML));
     alfay=double(atan(deltas(:,2)/focalML));
@@ -165,6 +163,4 @@ parfor w=1:modos;
         
     VectorZernikes(:,w)=solucionbi;
 end
-
-delete(Paralelo);
 
