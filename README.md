@@ -2,8 +2,11 @@
 
 This program was created by Sergio Bonaque-Gonzalez
 sergio.bonaque@um.es
+www.linkedin.com/in/sergiobonaque
 
-It is a simple shack-Hartmann simulator which include the following features;
+
+This script is open to contributions. I hope in the near future will be a very complete simulator.
+At the moment it is a shack-Hartmann simulator which includes the following features;
 Customization of:
     Resolution of CCD
     PixelSize
@@ -12,13 +15,14 @@ Customization of:
     Focal of microlenses
 Include the option of consider propagation between microlenses array and CCD. The script automatically calcules if Fresnel or Fraunhofer aproximation is necessary
 Cuantization 
+It calculates a variety of quality metrics as PSF, MTF, Sthrel ratio, Convolution with an extended object and analisys of residual error.
 
 To Do:
-- I like to program in a very easy to understand way. However it is not computationally optimal.
+- I like to program in a very easy-to-understand way. However it is not computationally optimal.
 - The script is very commented but in Spanish. If someone is very interested and wants to improve it, a further translation to english is possible.
 - Noise it is not considered, but it will be included in the near future.
 - The centroid estimation algorithm is basically the one from MATLAB. If noise it is include, the algorithm of centroid estimation should also be improved.
-- For testing purposes, in this moment the script only allows to use configurations of pixel and number of microlenses which allow an simmetric distribution of microlesenses and pupil. Now it can be removed, but it is something to do.
+- For testing purposes, in this moment the script only allows to use configurations of pixel and number of microlenses which allow a simmetric distribution of microlesenses and pupil. Now it can be removed, but it is something to do.
 - Include separation between microlenses
 
 Syntax:
