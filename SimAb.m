@@ -5,10 +5,10 @@ function [ZerRecuperados]=SimAb(modos,c,resolucion,TamPixel,LAMBDA,NLentes,focal
 
 
 %para simular un sensor de Shack-Hartmann
-%de dos maneras: uno suponiendo propagaciÛn del frente de onda entre cada
-%microlente y la CCD, por lo que la determinaciÛn del centroide es m·s
-%compleja y se acumulan m·s errores. La segunda manera es sin suponer
-%propagaciÛn, por lo que al final se trata de hacer un pseudo-binning (microesferas) de la
+%de dos maneras: uno suponiendo propagaci√≥n del frente de onda entre cada
+%microlente y la CCD, por lo que la determinaci√≥n del centroide es m√°s
+%compleja y se acumulan m√°s errores. La segunda manera es sin suponer
+%propagaci√≥n, por lo que al final se trata de hacer un pseudo-binning (microesferas) de la
 %imagen, calcular el centroide de cada subapertura, extrapolar las
 %pendientes y obtener el frente de onda a partir de las mismas.
 
@@ -18,7 +18,7 @@ function [ZerRecuperados]=SimAb(modos,c,resolucion,TamPixel,LAMBDA,NLentes,focal
 %***c = vector que contiene los coeficientes de zernike originales en la
 %notacion Noll. (ej. c=rand(10,1)
 %***resolucion=resolucion de la CCD (se suponen CCD cuadrados e impares) (ej. 1024)
-%***TamPixel=TamaÒo del pixel en la CCD (ej. 1.471e-6)
+%***TamPixel=Tama√±o del pixel en la CCD (ej. 1.471e-6)
 %***LAMBDA= longitud de onda en micras (ej. 0.780)
 %***NLentes= numero de lentes en cada direccion (se suponen matrices de
 %***microlentes cuadradas (ej.41)
@@ -49,7 +49,7 @@ tic
 % clear all
 % clc
 c=c(:);
-warning('off', 'Images:initSize:adjustingMag'); %Esta linea es para que no muestre el molesto aviso de que se est· cambiando el tamaÒo de la imagen al representar
+warning('off', 'Images:initSize:adjustingMag'); %Esta linea es para que no muestre el molesto aviso de que se est√° cambiando el tama√±o de la imagen al representar
 
 
 if  rem(resolucion,2)==0
@@ -128,7 +128,7 @@ for i=2:modos
     ZMODO=c(i)*ZerModo{i};
     ZSUMA=ZSUMA+ZMODO;
 end
-%Meto los zernikes creados en un cuadrado mas grande como se definiÛ al principio
+%Meto los zernikes creados en un cuadrado mas grande como se defini√≥ al principio
 W=ZSUMA.*1e-6;%paso a metros
 
 
@@ -172,7 +172,7 @@ WFSubpupil=W.*MicroLentesMascara;%Frente de onda visto a traves de las microlent
 %Voy a separar cada microlente para tratarla por separado
 Escala=6; %Este valor simboliza el espacio que le dejo a los lados para calcular la PSF. El cuadrado donde va alojada la PSF es Escala veces mas grande. El valor optimo para que no influya en la recuperacion del centroide es el doble.
 for i=1:length(CoorBuenas)
-        Lente{i}=WFSubpupil(CoorBuenas(i,1):CoorBuenas(i,2), CoorBuenas(i,3):CoorBuenas(i,4));%Separo el frente de onda que "ve" cada microlente. Est· en metros
+        Lente{i}=WFSubpupil(CoorBuenas(i,1):CoorBuenas(i,2), CoorBuenas(i,3):CoorBuenas(i,4));%Separo el frente de onda que "ve" cada microlente. Est√° en metros
         PadLente{i}=zeros(radioMLpxs*Escala);%Creo una matriz mas grande (escala/2 veces el radio)
         %PadLente{i}(((radioMLpxs*Escala)/2)-radioMLpxs+0.5:end+radioMLpxs-((radioMLpxs*Escala)/2)-0.5,((radioMLpxs*Escala)/2)-radioMLpxs+0.5:end+radioMLpxs-((radioMLpxs*Escala)/2)-0.5)= Lente{i};%Meto la lente en una matriz el doble de grande para eliminar efectos de borde
         PadLente{i}(radioMLpxs*2+1:end-radioMLpxs*2,radioMLpxs*2+1:end-radioMLpxs*2)= Lente{i};%Meto la lente en una matriz el doble de grande para eliminar efectos de borde
@@ -204,10 +204,10 @@ if Propagacion==0 %CASO DE NO PROPAGACION ENTRE MICROLENTES Y CCD
     end
 else %SUPONIENDO PROPAGACION ENTRE MICROLENTE Y CCD
     [~,a]=size(PadLente{1});
-    L=a*TamPixel;%TamaÒo del lado de cada region considerada
+    L=a*TamPixel;%Tama√±o del lado de cada region considerada
     if NFresnel> 0.5 && NFresnel<1;
         fprintf('Numero de Fresnel =%2.0f.\n',NFresnel);
-        fprintf('Cuidado, estamos en propagacion en el lÌmite del regimen de Fresnel.\n')
+        fprintf('Cuidado, estamos en propagacion en el l√≠mite del regimen de Fresnel.\n')
         PSF=cell(1,length(PadLente));
         PSFmaxLocal=zeros(1,length(PadLente));
         for j=1:length(PadLente)
@@ -274,12 +274,12 @@ end
 %significativamente en el algoritmo que se utilice para encontrar el
 %centroide. Cuando estemos con un prototipo real habra que tener en cuenta
 %todos estos factores y a partir de la medida de lentes calibradas elegir
-%el mejor mÈtodo de detecciÛn del algoritmo. En el caso de hacer
+%el mejor m√©todo de detecci√≥n del algoritmo. En el caso de hacer
 %simulaciones, vamos a aproximar que el detector no genera ruido y que no
 %se producen artefactos espureos, por lo que podemos calcular sin temor a
 %equivocarnos el centroide directamente con el toolbox de matlab.Para ver
 %algunas consecuencias de este problema leer: http://www.ctio.noao.edu/soar/sites/default/files/SAM/archive/5490-123.pdf
-%Y algunos mÈtodos para mejorar el calculo en un caso real en: "Shack-Hartmann wavefront sensor image analysis: a comparison of centroiding methods and image-processing techniques"
+%Y algunos m√©todos para mejorar el calculo en un caso real en: "Shack-Hartmann wavefront sensor image analysis: a comparison of centroiding methods and image-processing techniques"
 
 %La PSF ya esta normalizada del paso anterior
 centroideRealX=zeros(1,length(PSF));
@@ -290,7 +290,7 @@ centroideRealY=zeros(1,length(PSF));
 %En la realidad, existen interferencias entre microlentes que crean un
 %segundo o mas spots secundarios que afectan al calculo, siendo el error
 %introducido debido a esto =(theta(t)-theta'(t))/theta(t); siendo tetha el
-%angulo real de tilt y theta' el calculado ("Analysis on ShackñHartmann
+%angulo real de tilt y theta' el calculado ("Analysis on Shack¬ñHartmann
 %wave-front sensor with Fourier optics"). No obstante, en nuestro caso he
 %simulado un sistema perfecto donde cada microlente forma su imagen por
 %separado y no tendre en cuenta esto.
@@ -313,7 +313,7 @@ for i=1:length(CentroideReferencia)
     LongitudCentroide(i,2)=centroideRealY(i)-(Escala*radioMLpxs/2);
     CoorCentroide(i,1)=CentroideReferencia(i,1)+ LongitudCentroide(i,1);%coordenadas del centroide real
     CoorCentroide(i,2)=CentroideReferencia(i,3)+LongitudCentroide(i,2);
-    %Voy a poner un contador para saber cuando el centroide estarÌa en el
+    %Voy a poner un contador para saber cuando el centroide estar√≠a en el
     %area de otra microlente
     if LongitudCentroide(i,1)>radioMLpxs
         errores=errores+1;
@@ -358,12 +358,12 @@ end
                                                 drawnow();
                                             end
 
-%Todo centroide que estÈ por fuera de cada microlente est· invadiendo la
+%Todo centroide que est√© por fuera de cada microlente est√° invadiendo la
 %microlente contigua. En nuestro simulador la solucion es mejor que en la
 %realidad ya que al calcular la PSF y el centroide de la misma
 %individualmente y sobre un area mayor no tenemos este problema. En la
 %realidad esto es un problema de los sensores de Shack-Hartmann que no
-%tendremos con el nuestro. Aun asÌ, vamos a simular una situaciÛn ideal
+%tendremos con el nuestro. Aun as√≠, vamos a simular una situaci√≥n ideal
 %donde tenemos un algoritmo capaz de identificar que PSF viene de cada
 %microlente.
 
@@ -373,7 +373,7 @@ end
 % *************************************************************************  
 %Calculo los deltas en la posicion del centroide en cada microlente en
 %metros
-deltas=double(LongitudCentroide*TamPixel); %Estos deltas estan muy discretizados segun el n˙mero de pixeles.
+deltas=double(LongitudCentroide*TamPixel); %Estos deltas estan muy discretizados segun el n√∫mero de pixeles.
 
 %Calculo el alfa en cada microlente
 alfax= double(atan(deltas(:,1)/focalML));
@@ -447,8 +447,8 @@ solucionbi(length(solucionx)+1:length(soluciony)*2,1)=soluciony;
 %**************************************************************************
 % *************************************************************************  
 %El numero mas alto de Zernikes que pueden ser usados en la recuperacion
-%est· limitado por el numero de microlentes en una direccion. Esto
-%significa que si tenemos 30x30 microlentes, no deberiamos exceder el modo 900, en caso contrario el sistema estar· sobredeterminado.
+%est√° limitado por el numero de microlentes en una direccion. Esto
+%significa que si tenemos 30x30 microlentes, no deberiamos exceder el modo 900, en caso contrario el sistema estar√° sobredeterminado.
 
 %Si quisiera sacar la pendiente del frente de onda original
 %[WX,WY] = gradient(W,TamPixel); %Aparece el problema de los bordes y
@@ -456,10 +456,10 @@ solucionbi(length(solucionx)+1:length(soluciony)*2,1)=soluciony;
 % pendiente = sqrt(WX.^2 + WY.^2);
   
 %Para la recuperacion de la fase voy a utilizar estimacion lineal sin ligaduras,
-%utilizando la variante de estimacion modal. Se basa en la estimaciÛn de la aberracion de onda mediante la estimaciÛn de los coeficientes modales del desarrollo de la aberraciÛn en una base de polinomios ortogonales
+%utilizando la variante de estimacion modal. Se basa en la estimaci√≥n de la aberracion de onda mediante la estimaci√≥n de los coeficientes modales del desarrollo de la aberraci√≥n en una base de polinomios ortogonales
 %Un buen libro es este: "Wavefront Optics for Vision Correction", Escrito por Guang-ming Dai.
 %"https://books.google.es/books?id=aCC-IciqKkYC&pg=PA123&lpg=PA123&dq=matlab+wave+front+derivatives&source=bl&ots=5tSBxQAEbN&sig=ToS1Ns-zQSb6q43NsA02nA513Os&hl=es&sa=X&ved=0ahUKEwiO8fSHkYPRAhUBXRoKHUdQDMwQ6AEINzAD#v=onepage&q=matlab%20wave%20front%20derivatives&f=false"
-%Ademas es el mÈtodo sugerido por Justo Arines.
+
 
 
 
@@ -490,7 +490,7 @@ end
 
 clear configuracion
 
-%Recuperacion por mÌnimos cuadrados. Es equivalente a construir la matriz
+%Recuperacion por m√≠nimos cuadrados. Es equivalente a construir la matriz
 %de recuperacion
 ZerRecuperados = lsqr((VectorZernikes(:,1:modos)*1e-6)/factor,solucionbi,1e-10,500);
 
@@ -522,7 +522,7 @@ WPad=ZTOTALPad.*1e-6;%paso a metros
 % ***********ANALISIS DEL RESIDUO******************************************
 %**************************************************************************
 % *************************************************************************                                            
-%MATRIZ DE ACOPLAMIENTO. Pagina 69 tesis de Justo
+%MATRIZ DE ACOPLAMIENTO. Pagina 69 tesis de Justo Arines
 %B es la matriz matriz de deviradas de Zernikes evaluadas en los puntos de medida pero con el numero de Zernikes que tiene el haz incidente
 %AA=inv((transpose(VectorZernikes)*VectorZernikes))*transpose(VectorZernikes)*B;
 Residuo=pupilPad.*(WPad-WRec);
@@ -536,22 +536,22 @@ PFRes=pupilPad.*exp(sqrt(-1)*k*Residuo);
 %PSF
 PSFOrig=fft2(PFOrig); %Two-dimensional discrete Fourier Transform.
 clear PFOrig;
-PSFOrig=fftshift(PSFOrig);% Esto serÌa la amplitud compleja de la PSF. Sacado de la ayuda de MATLAB: FFTSHIFT is useful for visualizing the Fourier transform with the zero-frequency component in the middle of the spectrum.
+PSFOrig=fftshift(PSFOrig);% Esto ser√≠a la amplitud compleja de la PSF. Sacado de la ayuda de MATLAB: FFTSHIFT is useful for visualizing the Fourier transform with the zero-frequency component in the middle of the spectrum.
 PSFOrig=PSFOrig.*conj(PSFOrig);%Esto ya es el modulo de la PSF
 
 PSFRec=fft2(PFRec); %Two-dimensional discrete Fourier Transform.
 clear PFRec;
-PSFRec=fftshift(PSFRec);% Esto serÌa la amplitud compleja de la PSF. Sacado de la ayuda de MATLAB: FFTSHIFT is useful for visualizing the Fourier transform with the zero-frequency component in the middle of the spectrum.
+PSFRec=fftshift(PSFRec);% Esto ser√≠a la amplitud compleja de la PSF. Sacado de la ayuda de MATLAB: FFTSHIFT is useful for visualizing the Fourier transform with the zero-frequency component in the middle of the spectrum.
 PSFRec=PSFRec.*conj(PSFRec);%Esto ya es el modulo de la PSF
 
 PSFDif=fft2(PFDif); %Two-dimensional discrete Fourier Transform.
 clear PFDif;
-PSFDif=fftshift(PSFDif);% Esto serÌa la amplitud compleja de la PSF. Sacado de la ayuda de MATLAB: FFTSHIFT is useful for visualizing the Fourier transform with the zero-frequency component in the middle of the spectrum.
+PSFDif=fftshift(PSFDif);% Esto ser√≠a la amplitud compleja de la PSF. Sacado de la ayuda de MATLAB: FFTSHIFT is useful for visualizing the Fourier transform with the zero-frequency component in the middle of the spectrum.
 PSFDif=PSFDif.*conj(PSFDif);%Esto ya es el modulo de la PSF
 
 PSFRes=fft2(PFRes); %Two-dimensional discrete Fourier Transform.
 clear PFRes;
-PSFRes=fftshift(PSFRes);% Esto serÌa la amplitud compleja de la PSF. Sacado de la ayuda de MATLAB: FFTSHIFT is useful for visualizing the Fourier transform with the zero-frequency component in the middle of the spectrum.
+PSFRes=fftshift(PSFRes);% Esto ser√≠a la amplitud compleja de la PSF. Sacado de la ayuda de MATLAB: FFTSHIFT is useful for visualizing the Fourier transform with the zero-frequency component in the middle of the spectrum.
 PSFRes=PSFRes.*conj(PSFRes);%Esto ya es el modulo de la PSF
 
                                             if pintar==1
@@ -593,7 +593,7 @@ StRes=max(max(PSFRes))/max(max(PSFDif));
 fprintf('La razon de Strhel del residuo es %2.5f\n',StRes);
 
 
-%Otra opcion serÌa obtener la razon de sthrel de la fase original y luego
+%Otra opcion ser√≠a obtener la razon de sthrel de la fase original y luego
 %la de la fase recuperada y normalizar a la de la fase original
 StOrig=max(max(PSFOrig))/max(max(PSFDif));
 StRec=max(max(PSFRec))/max(max(PSFDif));
@@ -603,7 +603,7 @@ RMSOrig=sqrt(sum(c(4:length(c)).^2));
 RMSRec=sqrt(sum(ZerRecuperados(4:length(ZerRecuperados)).^2));
 RMSResta=sqrt(sum(abs(c(4:length(c))-ZerRecuperados(4:length(ZerRecuperados))).^2));
 fprintf('La diferencia entre RMS del frente de onda original (%2.5f) y el recuperado (%2.5f) es = %2.5f (%2.2f de error en porcentaje).\n',RMSOrig,RMSRec,RMSResta,100-(RMSRec*100/RMSOrig));
-fprintf('El tamaÒo de la pupila es %2.5f metros\n',TamanoSensor);
+fprintf('El tama√±o de la pupila es %2.5f metros\n',TamanoSensor);
 
 
 
