@@ -14,11 +14,17 @@ I am open to include any request.
 This script is open to contributions. I hope in the near future will be a very complete simulator.
 At the moment it is a shack-Hartmann simulator which includes the following features;
 Customization of:
+
     Resolution of CCD. 
+    
     PixelSize.
+    
     Wavelength.
+    
     Number of microlenses.
+    
     Focal of microlenses.
+    
 Include the option of consider propagation between microlenses array and CCD. The script automatically calcules if Fresnel or Fraunhofer aproximation is necessary.
 Cuantization.
 It calculates a variety of quality metrics as PSF, MTF, Sthrel ratio, Convolution with an extended object and analisys of residual error.
