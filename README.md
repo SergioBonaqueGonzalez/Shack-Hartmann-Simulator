@@ -38,16 +38,27 @@ Syntax:
 [ZerRecuperados]=SimAb(modos,c,resolucion,TamPixel,LAMBDA,NLentes,focalML,Propagacion,factor,bits,pintar)
 
 modos= zernike modes (ej. modos=10)
+
 c = vector with the zernike coefficients in Noll notation (ej. c=rand(10,1)
+
 resolucion= resolution of CCD (only square and odd CCDs are considered) (ej. 1024)
+
 TamPixel=Tamaño del pixel en la CCD (ej. 1.471e-6)
+
 LAMBDA= Wavelength in microns (ej. 0.780)
+
 NLentes= Number of microlenses in a row (it is supposed square microlenses array (ej.41))
+
 focalML= Microlenses focal in meters.
+
 Propagacion= Flag that indicates if propagation between microlenses and CCD should be taken into account: =0 no propagation =1 propagation
+
 factor= The value of zernike coeficients used for characterization of the sensor. ej=1e-8
+
 bits= bits used for quantization of CCD
+
 pintar= Flag which indicates if figures should be painted or not 1=yes, 2=no
+
 
 Example of use:
 
