@@ -26,6 +26,7 @@ To Do:
 - Include separation between microlenses
 
 Syntax:
+
 [ZerRecuperados]=SimAb(modos,c,resolucion,TamPixel,LAMBDA,NLentes,focalML,Propagacion,factor,bits,pintar)
 
 modos= zernike modes (ej. modos=10)
@@ -41,6 +42,7 @@ bits= bits used for quantization of CCD
 pintar= Flag which indicates if figures should be painted or not 1=yes, 2=no
 
 Example of use:
+
 modos=36;
 c(1:15)=rand(15,1);
 c(16:modos)=0.1*rand(length(16:modos),1);
