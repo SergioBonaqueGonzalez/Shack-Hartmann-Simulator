@@ -1,4 +1,7 @@
 function mask = anular_mask(dimx, dimy, X_cent, Y_cent, R_int, R_ext)
+%Created by Juan Valdivia and modified by Sergio Bonaque-Gonzalez. Optical Engineer.
+%   sergio.bonaque@um.es
+% This function calculates a anular and circular masks.
 
     mask  = zeros(dimx, dimy);
     dimx_ = dimx - 1;
