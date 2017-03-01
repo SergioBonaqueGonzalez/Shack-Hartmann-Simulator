@@ -175,7 +175,7 @@ end
 %CALCULATING THE PSF OF EACH MICROLENT
 NFresnel=((TamanoSensor/2)^2)/(lambda*focalML); %Fresnel expression describes diffraction under the paraxial assumption, where only rays that make a small angle (< ~0.1 rad) relative to the optical axis are considered. 
 if Propagacion==0 %CASE OF NO PROPAGATION BETWEEN MICROLENSES AND CCD
-    fprintf('No se considera propagacion entre microlentes y CCD.\n')
+    fprintf('Propagation between microlenses and CCD is not considered.\n')
     PSF=cell(1,length(PadLente));%Prealoco los arrays
     PSFmaxLocal=zeros(1,length(PadLente));
     for i=1:length(PadLente)
