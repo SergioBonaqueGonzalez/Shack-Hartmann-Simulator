@@ -1,36 +1,23 @@
 function [ZerRecuperados]=SimAb(modos,c,resolucion,TamPixel,LAMBDA,NLentes,focalML,Propagacion,factor,bits,pintar)
 
-%Programa hecho por Sergio Bonaque-Gonzalez
+%Created by Sergio Bonaque-Gonzalez. Optical Engineer.
 %   sergio.bonaque@um.es
+% This program simulates a Shack-Hartmann sensor. 
 
+%INPUTS
+%***modos= number of Zernike modes inteded to be recovered (ej. modos=10)
+%***c = vector that contains the Zernike coefficients of the incoming phase in Noll notation. (ej. c=rand(10,1)
+%***resolucion=resolution of CCD (Only square and odd CCDs are suported) (ej. 1024)
+%***TamPixel= Pixel size of the CCD (ej. 1.471e-6)
+%***LAMBDA= wavelength of the simulations in microns (ej. 0.780)
+%***NLentes= number of microlenses in a row in the microlenses array (ej.41)
+%***focalML= Focal length of the microlenses in meters.
+%***Propagacion= flag that indicates if propagation should be considered between microlenses and CCD =0 NO propagation; =1 Propagation 
+%***factor= the value with which zernize coefficients are characterized through the system. ej=1e-8
+%***bits= number of bits of the CCD 
+%***pintar= dummy flag which indicates if all figures should be painted 1=YES, 2=NO
 
-%para simular un sensor de Shack-Hartmann
-%de dos maneras: uno suponiendo propagación del frente de onda entre cada
-%microlente y la CCD, por lo que la determinación del centroide es más
-%compleja y se acumulan más errores. La segunda manera es sin suponer
-%propagación, por lo que al final se trata de hacer un pseudo-binning (microesferas) de la
-%imagen, calcular el centroide de cada subapertura, extrapolar las
-%pendientes y obtener el frente de onda a partir de las mismas.
-
-%Fecha de inicio: 30/11/2016 
-
-%***modos= modos de zernike que se intentaran recuperar (ej. modos=10)
-%***c = vector que contiene los coeficientes de zernike originales en la
-%notacion Noll. (ej. c=rand(10,1)
-%***resolucion=resolucion de la CCD (se suponen CCD cuadrados e impares) (ej. 1024)
-%***TamPixel=Tamaño del pixel en la CCD (ej. 1.471e-6)
-%***LAMBDA= longitud de onda en micras (ej. 0.780)
-%***NLentes= numero de lentes en cada direccion (se suponen matrices de
-%***microlentes cuadradas (ej.41)
-%***focalML=Focal de las microlentes en metros
-%***Propagacion= marcador que indica si se va a usar propagacion entre las
-%microlentes y la CCD: =0 no se considera que haya propagacion entre las lentes y el ccd; =1 SI hay propagacion 
-%***factor=el valor con el que se caracterizan los zernikes. ej=1e-8
-%***bits=numero de bits que dispone la CCD: si se deja en 0, se realizan los
-%calculos con precision doble de MATLAB
-%***pintar=Variable que indica si se van a pintar figuras o no 1=SI, 2=NO
-
-%%Ejemplo de uso:
+%%Example of use:
 %modos=36;
 %c(1:15)=rand(15,1);
 %c(16:modos)=0.1*rand(length(16:modos),1);
@@ -48,51 +35,50 @@ tic
 % close all
 % clear all
 % clc
-c=c(:);
-warning('off', 'Images:initSize:adjustingMag'); %Esta linea es para que no muestre el molesto aviso de que se está cambiando el tamaño de la imagen al representar
+c=c(:);%This line avoid annoying messages when painting
+warning('off', 'Images:initSize:adjustingMag'); 
 
 
 if  rem(resolucion,2)==0
-    error('Error.La resolucion debe ser impar para tener un pixel central y definir los coeficientes de zernike simetricamente.')
+    error('Error. Resolution of the CCD should be odd.')
 end
 
-espaciado=floor(resolucion/NLentes(1)); %Esto es los pixeles de la CCD asignados a cada microlente
+espaciado=floor(resolucion/NLentes(1)); %Asigned pixels in CCD to each microlense
 Resto=resolucion-NLentes(1)*espaciado;
 
 if  rem(Resto,2)~=0
-    error('Error.La configuracion actual no permite una disposicion simetrica de las microlentes. Pruebe a aumentar o disminuir en uno el numero de microlentes o a cambiar la resolucion.')
+    error('Error.This configuration does not allow a symmetric configuration of microlenses array. Please, change the number of microlenses or the resolution.')
 end
 
 
 
-lambda = LAMBDA*1e-6;%Longitud de onda en metros
+lambda = LAMBDA*1e-6;%Wavelength in meters
 k = 2*pi/lambda;
 TamanoSensor=TamPixel*resolucion;
-SeparacionML=0; %Separacion entre microlentes. En este script se supone que es cero. Queda para el futuro implementar una separacion.
+SeparacionML=0; % Distance between microlenses. Now it is suppossed to be zero. This is something to be implemented in the future
 
-Radio=TamanoSensor/2;%Radio de la pupila circunscrita en el sensor.
+Radio=TamanoSensor/2;%Radius of the pupil
 [pupil,rho]=CrearPupila(resolucion);
 
 
 % *************************************************************************
-% ************************CREACION MATRIZ DE ZERNIKES**********************
+% ************************Calculation Zernike matrix**********************
 % *************************************************************************
 % *************************************************************************
-%Busca si se ha creado previamente la matriz de zernikes unidad con la
-%configuracion actual. 
+%First, search for the Zernike Matrix with the actual configuration of the simulator.
 
 if exist ('MatrizZernikes.mat','file') ~=0 && exist ('config.mat','file') ~=0
     est=load ('config.mat');
     config=est.config;
     clear est
     if config.resolucion==resolucion && config.modos==modos 
-        fprintf ('Matriz de zernikes ya creada.\n')
+        fprintf ('Zernike matrix already exists.\n')
         ZerModo=load ('MatrizZernikes.mat');
         ZerModo=ZerModo.ZerModo;
     else
         delete('MatrizZernikes.mat');
         delete('config.mat');
-        fprintf ('Se ha modificado la configuracion.Calculando nueva matriz de zernikes...\n')
+        fprintf ('Configuration has ben modified. Calculating a new Zernike matrix...\n')
         ZerModo=cell(modos,1);
         for i=1:modos
             ZerModo{i}=zernike(i,resolucion);
@@ -102,7 +88,7 @@ if exist ('MatrizZernikes.mat','file') ~=0 && exist ('config.mat','file') ~=0
         save('config.mat', 'config')
     end
 else
-    fprintf('Matriz de zernikes no disponible. Calculando...\n')
+    fprintf('Zernike matrix not available. Calculating...\n')
     ZerModo=cell(modos,1);
     for i=1:modos
         ZerModo{i}=zernike(i,resolucion);
@@ -117,70 +103,65 @@ clear config
 
 
 % *************************************************************************
-% *********** INTRODUCIR ZERNIKES EN MICRAS (NOTACION NOLL)****************
-% ********** DEL FRENTE DE ONDA SIMULADO A RECUPERAR***********************
+% *********** Introducing the incoming wavefront in microns (NOLL NOTATION**********
 %Zernike polyomials and atmospheric turbulence J Op Soc Am. Vol 66, No 3 , March 1976**********************
 % *************************************************************************
 ZSUMA=zeros(length(ZerModo{1}));
 
-%Voy a suponer que los 3 primeros coeficientes de zernike son cero
+%It is suppose to set the 3 first value to zero.
 for i=2:modos
     ZMODO=c(i)*ZerModo{i};
     ZSUMA=ZSUMA+ZMODO;
 end
-%Meto los zernikes creados en un cuadrado mas grande como se definió al principio
-W=ZSUMA.*1e-6;%paso a metros
+W=ZSUMA.*1e-6;%conversion to meters
 
 
                                               
 
-                                            %Para pintar
+                                            %Painting
                                             [pupilpintar]=PintarFrenteOnda(rho,W,pintar);
                                             
                                             
 % *************************************************************************
-% ***************DEFINICION MATRIZ MICROLENTES*****************************
+% ***************DEFINITION OF THE MICROLENSES ARRAY***********************
 %**************************************************************************
 % *************************************************************************          
 [MicroLentesMascara,radioMLpxs,CoorBuenas,Eliminadas]=MicroL(NLentes,resolucion,SeparacionML,pupil,pupilpintar,W,pintar);
 
 
 % *************************************************************************
-% ***********BONDAD DEL MUESTREO EN CADA MICROLENTE************************
+% ***********SAMPLING GOODNESS IN EACH MICROLENT**************************
 %**************************************************************************
 % *************************************************************************     
-RadioMLm=TamPixel*radioMLpxs;%Radio en mm de las microlentes
-FML=focalML/(RadioMLm*2);%Numero F de las microlentes
-Deltax=FML*lambda; %Ecuaciones sacadas del libro de Fourier para saber si el muestreo de cada microlente es suficiente
+RadioMLm=TamPixel*radioMLpxs;%Radius in mmm
+FML=focalML/(RadioMLm*2);%F number of each microlent
+Deltax=FML*lambda; 
 MuestreoNecesario=RadioMLm*2/Deltax;
 
 if MuestreoNecesario<=radioMLpxs*2
-    fprintf ('Muestreo de microlentes adecuado.\n')
+    fprintf ('Sampling of microlenses is good enough.\n')
 else
-    fprintf ('ERROR: display de microlentes inadecuado.\n')
+    fprintf ('ERROR: sampling of microlenses is inadequate.\n')
 end
 
-Lente=cell(1,length(CoorBuenas));%Prealoco los arrays
-PadLente=cell(1,length(CoorBuenas));%Prealoco los arrays
+Lente=cell(1,length(CoorBuenas));%Preallocation
+PadLente=cell(1,length(CoorBuenas));%Preallocation
 
 
 % *************************************************************************
-% ***********CALCULO DE LA IMAGEN DE CADA MICROLENTES**********************
+% ***********CALCULATING IMAGE OF EACH MICROLENT**********************
 %**************************************************************************
 % *************************************************************************     
-WFSubpupil=W.*MicroLentesMascara;%Frente de onda visto a traves de las microlentes
-%Voy a separar cada microlente para tratarla por separado
-Escala=6; %Este valor simboliza el espacio que le dejo a los lados para calcular la PSF. El cuadrado donde va alojada la PSF es Escala veces mas grande. El valor optimo para que no influya en la recuperacion del centroide es el doble.
+WFSubpupil=W.*MicroLentesMascara;%Wavefront through each microlent
+%Each microlent is managed separately
+Escala=6; % This value imply an extra space around each microlent when calculating the PSF in order to avoid borders effects. The optimum value is the double of the original.
 for i=1:length(CoorBuenas)
-        Lente{i}=WFSubpupil(CoorBuenas(i,1):CoorBuenas(i,2), CoorBuenas(i,3):CoorBuenas(i,4));%Separo el frente de onda que "ve" cada microlente. Está en metros
-        PadLente{i}=zeros(radioMLpxs*Escala);%Creo una matriz mas grande (escala/2 veces el radio)
-        %PadLente{i}(((radioMLpxs*Escala)/2)-radioMLpxs+0.5:end+radioMLpxs-((radioMLpxs*Escala)/2)-0.5,((radioMLpxs*Escala)/2)-radioMLpxs+0.5:end+radioMLpxs-((radioMLpxs*Escala)/2)-0.5)= Lente{i};%Meto la lente en una matriz el doble de grande para eliminar efectos de borde
-        PadLente{i}(radioMLpxs*2+1:end-radioMLpxs*2,radioMLpxs*2+1:end-radioMLpxs*2)= Lente{i};%Meto la lente en una matriz el doble de grande para eliminar efectos de borde
+        Lente{i}=WFSubpupil(CoorBuenas(i,1):CoorBuenas(i,2), CoorBuenas(i,3):CoorBuenas(i,4));
+        PadLente{i}=zeros(radioMLpxs*Escala);
+        PadLente{i}(radioMLpxs*2+1:end-radioMLpxs*2,radioMLpxs*2+1:end-radioMLpxs*2)= Lente{i};
 end
 
-%Me defino la pupila de cada microlente en binario. La defino fuera de la
-%funcion MicroL porque esta pupila ocupa mas pixeles para muestrear bien la
-%PSF
+%Defining the pupil of each microlent in binary.
 PupilaML=PadLente{1};
 [a,b]=size(PupilaML);
 for i=1:a
@@ -191,75 +172,73 @@ for i=1:a
     end
 end
 
-%CALCULO DE LA PSF DE CADA MICROLENTE
-NFresnel=((TamanoSensor/2)^2)/(lambda*focalML); %Si este numero es mucho menor que 1, se usa Fraunhofer. Si no, se puede usar fresnel. Fresnel expression describes diffraction under the paraxial assumption, where only rays that make a small angle (< ~0.1 rad) relative to the optical axis are considered. 
-if Propagacion==0 %CASO DE NO PROPAGACION ENTRE MICROLENTES Y CCD
+%CALCULATING THE PSF OF EACH MICROLENT
+NFresnel=((TamanoSensor/2)^2)/(lambda*focalML); %Fresnel expression describes diffraction under the paraxial assumption, where only rays that make a small angle (< ~0.1 rad) relative to the optical axis are considered. 
+if Propagacion==0 %CASE OF NO PROPAGATION BETWEEN MICROLENSES AND CCD
     fprintf('No se considera propagacion entre microlentes y CCD.\n')
     PSF=cell(1,length(PadLente));%Prealoco los arrays
     PSFmaxLocal=zeros(1,length(PadLente));
     for i=1:length(PadLente)
-        PF=PupilaML.*exp(sqrt(-1)*k.*PadLente{i});%Funcion pupila
+        PF=PupilaML.*exp(sqrt(-1)*k.*PadLente{i});%Pupil function
         PSF{i}=abs(ifftshift(ifft2(fftshift(PF)))).^2;%PSF
         PSFmaxLocal(i)=max(max(PSF{i}));
     end
-else %SUPONIENDO PROPAGACION ENTRE MICROLENTE Y CCD
+else 
     [~,a]=size(PadLente{1});
-    L=a*TamPixel;%Tamaño del lado de cada region considerada
+    L=a*TamPixel;
     if NFresnel> 0.5 && NFresnel<1;
         fprintf('Numero de Fresnel =%2.0f.\n',NFresnel);
-        fprintf('Cuidado, estamos en propagacion en el límite del regimen de Fresnel.\n')
+        fprintf('Aware, it is in the border of Fresnel region.\n')
         PSF=cell(1,length(PadLente));
         PSFmaxLocal=zeros(1,length(PadLente));
         for j=1:length(PadLente)
             S = exp(k*1i.*PadLente{j}); %complex phase screen
             propagada=propagacionFresnel(S.*PupilaML,L,lambda,focalML);
-            PSF{j} = (abs(propagada).^2);%Intensidad de la imagen 1
+            PSF{j} = (abs(propagada).^2);
             PSFmaxLocal(j)=max(max(PSF{j}));
         end
     elseif NFresnel>= 1
         fprintf('Numero de Fresnel =%2.0f.\n',NFresnel);
-        fprintf ('Propagacion en regimen de Fresnel.\n')
+        fprintf ('Propagation in Fresnel regime.\n')
         PSF=cell(1,length(PadLente));
         PSFmaxLocal=zeros(1,length(PadLente));
         for j=1:length(PadLente)
             S = exp(k*1i.*PadLente{j}); %complex phase screen
             propagada=propagacionFresnel(S.*PupilaML,L,lambda,focalML);
-            PSF{j} = (abs(propagada).^2);%Intensidad de la imagen 1
+            PSF{j} = (abs(propagada).^2);
             PSFmaxLocal(j)=max(max(PSF{j}));
         end
     else
         fprintf('Numero de Fresnel =%2.0f.\n',NFresnel);
-        fprintf ('Propagacion en regimen de Fraunhofer.\n')
+        fprintf ('Propagation in Fraunhofer regime.\n')
         PSF=cell(1,length(PadLente));
         PSFmaxLocal=zeros(1,length(PadLente));
         for j=1:length(PadLente)
             S = exp(k*1i.*PadLente{j}); %complex phase screen
             propagada=propagacionFraunhofer(S.*PupilaML,L,lambda,focalML);
-            PSF{j} = (abs(propagada).^2);%Intensidad de la imagen 1
+            PSF{j} = (abs(propagada).^2);
             PSFmaxLocal(j)=max(max(PSF{j}));
         end
     end
 end
 
-%Lo que he hecho para simular una CCD real es normalizar con respecto al
-%maximo total. Para simular la profundidad de bits, discretizo con respecto
-%al numero de bits
+%Quantization according the bits of the CCD
 if bits==0
-    fprintf('Calculos realizados con precision "double" de MATLAB. \n');
+    fprintf('Calculations performed with "double" precision of MATLAB. \n');
     for j=1:length(PSF)
         PSF{j}=PSF{j}/max(max(PSF{j}));
     end
 else
     
     PSFmax=max(max(PSFmaxLocal));
-    fprintf('Calculos realizados para %2.0f bits. \n',bits);
+    fprintf('Calculations performed for %2.0f bits. \n',bits);
     for i=1:length(PSF)
         PSF{i}=round((PSF{i}/PSFmax)*((2^bits)-1));
     end
 end
 
 
-                                            %Para pintar
+                                            %Ppainting
                                             if pintar==1
                                                 pintarPSFMatriz(PSF,MicroLentesMascara,radioMLpxs,CoorBuenas,pupilpintar,Escala)
                                                 drawnow();
@@ -269,32 +248,18 @@ end
 % ***********CALCULO DEL CENTROIDE*****************************************
 %**************************************************************************
 % *************************************************************************   
-%Hallar el centroide en un sensor de Shack-Hartmann es un tema complicado.
-%El ruido y el numero de fotones es importante y puede influir
-%significativamente en el algoritmo que se utilice para encontrar el
-%centroide. Cuando estemos con un prototipo real habra que tener en cuenta
-%todos estos factores y a partir de la medida de lentes calibradas elegir
-%el mejor método de detección del algoritmo. En el caso de hacer
-%simulaciones, vamos a aproximar que el detector no genera ruido y que no
-%se producen artefactos espureos, por lo que podemos calcular sin temor a
-%equivocarnos el centroide directamente con el toolbox de matlab.Para ver
-%algunas consecuencias de este problema leer: http://www.ctio.noao.edu/soar/sites/default/files/SAM/archive/5490-123.pdf
-%Y algunos métodos para mejorar el calculo en un caso real en: "Shack-Hartmann wavefront sensor image analysis: a comparison of centroiding methods and image-processing techniques"
+%This is a very simple simulation which does not include noise. 
+%Some problems regarding centroid estimation in Shak-Hartmann:http://www.ctio.noao.edu/soar/sites/default/files/SAM/archive/5490-123.pdf
+%Some methods for improve this calculataion: "Shack-Hartmann wavefront sensor image analysis: a comparison of centroiding methods and image-processing techniques"
 
-%La PSF ya esta normalizada del paso anterior
 centroideRealX=zeros(1,length(PSF));
 centroideRealY=zeros(1,length(PSF));
 
-%Llamo a la funcion CalCentroides que calcula la posicion del centroide con
-%precision subpixel.
-%En la realidad, existen interferencias entre microlentes que crean un
-%segundo o mas spots secundarios que afectan al calculo, siendo el error
-%introducido debido a esto =(theta(t)-theta'(t))/theta(t); siendo tetha el
-%angulo real de tilt y theta' el calculado ("Analysis on ShackHartmann
-%wave-front sensor with Fourier optics"). No obstante, en nuestro caso he
-%simulado un sistema perfecto donde cada microlente forma su imagen por
-%separado y no tendre en cuenta esto.
-display=0; %1=se pintan los centroides, 0=no se pintan
+%CalCentroides function calculates the centroid coordinates with sub-pixel precision. 
+%In real phase sensor with microlenses arrays, there exists interferences between microlenses apertures, creating one or more secondary spots, finally affecting the calculation. The error term associate to this fact is  =(theta(t)-theta'(t))/theta(t); being tetha the
+% the real tilt angle and theta' the calculated oneel calculado ("Analysis on ShackHartmann
+%wave-front sensor with Fourier optics"). However, in this case each microlent produces its image separately, so this issue is not taken into account. 
+display=0; %1= centroids are painted, 0=no 
 if display==1
     figure
 end
@@ -303,18 +268,17 @@ for i=1:length(PSF)
 end
 
 
-%Hallo las coordenadas de los centroides y de los centroides de referencia
-CentroideReferencia=CoorBuenas+radioMLpxs;%coordenadas del centroide de referencia
+%Coordinates of the real centroids and the reference centroids are calculated. 
+CentroideReferencia=CoorBuenas+radioMLpxs;% Coordinates of the reference centroid.
 errores=0;
 LongitudCentroide=zeros(length(CoorBuenas),2);
 CoorCentroide=zeros(length(CoorBuenas),2);
 for i=1:length(CentroideReferencia)
     LongitudCentroide(i,1)=centroideRealX(i)-(Escala*radioMLpxs/2);
     LongitudCentroide(i,2)=centroideRealY(i)-(Escala*radioMLpxs/2);
-    CoorCentroide(i,1)=CentroideReferencia(i,1)+ LongitudCentroide(i,1);%coordenadas del centroide real
+    CoorCentroide(i,1)=CentroideReferencia(i,1)+ LongitudCentroide(i,1);
     CoorCentroide(i,2)=CentroideReferencia(i,3)+LongitudCentroide(i,2);
-    %Voy a poner un contador para saber cuando el centroide estaría en el
-    %area de otra microlente
+    %This introduces a count in order to know where double spots are produced
     if LongitudCentroide(i,1)>radioMLpxs
         errores=errores+1;
     else
@@ -325,10 +289,10 @@ for i=1:length(CentroideReferencia)
 end
 
 
-                                            %Para pintar
+                                            %Painting
                                             if pintar==1
                                                 figure
-                                                suptitle('Centroide de referencia vs centroide encontrado')
+                                                suptitle('Reference centroid vs calculated centroid')
                                                 subplot(1,2,1)
                                                 set(gcf,'color','w');
                                                 plot(CentroideReferencia(:,1),CentroideReferencia(:,3),'o','MarkerSize',2,'MarkerEdgeColor','r')
@@ -339,19 +303,19 @@ end
                                                     rectangle('Position', [CoorBuenas(i,1) CoorBuenas(i,3) radioMLpxs*2 radioMLpxs*2],'LineWidth', 0.1, 'EdgeColor', 'b');
                                                     %pause(0.01)
                                                 end
-                                                legend('Centroide de referencia','Centroide encontrado')
-                                                title('Posicion de los centroides') 
-                                                xlabel({'pixeles';['Numero de centroides que se saldrian del area de cada microlente (crosstalk): ' num2str(errores)]});
-                                                ylabel('pixeles')
+                                                legend('Reference centroid','calculated centroid')
+                                                title('Centroids position') 
+                                                xlabel({'pixels';['Number of centroids exceeding its microlent area (crosstalk): ' num2str(errores)]});
+                                                ylabel('pixels')
                                                 set(gca,'ydir','reverse')
                                                 xlim([0 resolucion])
                                                 ylim([0 resolucion])
                                                 
                                                 subplot(1,2,2)
                                                 quiver(CentroideReferencia(:,1),CentroideReferencia(:,3),LongitudCentroide(:,1),LongitudCentroide(:,2),0);
-                                                title('Desplazamiento del centroide real') 
-                                                xlabel('pixeles')
-                                                ylabel('pixeles')
+                                                title('Displacement of the real centroid') 
+                                                xlabel('pixels')
+                                                ylabel('pixels')
                                                 set(gca,'ydir','reverse')
                                                 xlim([0 resolucion])
                                                 ylim([0 resolucion])
