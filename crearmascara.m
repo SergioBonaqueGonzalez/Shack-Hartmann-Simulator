@@ -1,14 +1,17 @@
 function mascara=crearmascara(puntos)
+%Created by Sergio Bonaque-Gonzalez. Optical Engineer.
+%   sergio.bonaque@um.es
+% This function creates a circular mask inside a certain square matrix.
 
-xp=linspace(-1,1,puntos); %ampliar para ampliar el tamaño de la PSF
-[X,Y]=meshgrid (xp,xp); %Meshgrid crea una matriz cuyas filas son copias del vector xp, y cuyas columnas son copias del vector xp
-[rho]=sqrt(X.^2+Y.^2); %hipotenusa. Matriz que sustituye cada valor por el de su hipotenusa con respecto a su posicion
+xp=linspace(-1,1,puntos); 
+[X,Y]=meshgrid (xp,xp); 
+[rho]=sqrt(X.^2+Y.^2); 
 
-[a,b]=size(rho); %con  estas lineas estoy dibujando un circulo
+[a,b]=size(rho); 
 mascara=ones(size(rho));
 for i=(1:a)
     for j=(1:b);
-        if rho(i,j) > 1 ;%Este es el valor del radio del circulo unidad donde van a estar definidos los zernikes.
+        if rho(i,j) > 1 ;%Defines the mask with a radius=1
             mascara(i,j)=0;
         end;
     end;
