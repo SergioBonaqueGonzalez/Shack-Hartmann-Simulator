@@ -1,27 +1,30 @@
 function pintarPSFMatriz(PSF,MicroLentesMascara,radioMLpxs,CoorBuenas,pupilpintar,Escala)
+%Created by Sergio Bonaque-Gonzalez. Optical Engineer.
+%   sergio.bonaque@um.es
+% This function paints the PSF of each microlense.
 
-Sobrante=((Escala*radioMLpxs)-radioMLpxs*2)/2;%Esto son los pixeles que se añadieron de mas a cada lado de las microlentes para calcular la PSF
+
+
+Sobrante=((Escala*radioMLpxs)-radioMLpxs*2)/2;%These are the virtually added pixels to each microlenses in order to calculate the PSF.
 BackGround=zeros(size(MicroLentesMascara)+2*Sobrante);
 
-%Junto todas las PSF en la misma figura
+%Joinning all PSF in the same figure
 for i=1:length(PSF)
         BackGround(CoorBuenas(i,1):CoorBuenas(i,2)+2*Sobrante, CoorBuenas(i,3):CoorBuenas(i,4)+2*Sobrante)=BackGround(CoorBuenas(i,1):CoorBuenas(i,2)+2*Sobrante, CoorBuenas(i,3):CoorBuenas(i,4)+2*Sobrante)+PSF{i};
-
 end
 
 figure
 subplot(1,2,1)
 imshow(BackGround,[])
-title('Imagen en la CCD (dobles spots incluidos)') 
+title('Image in the CCD (doubles spots are included)') 
 set(gcf,'color','w');
-xlabel('pixeles')
-ylabel('pixeles')
+xlabel('pixels')
+ylabel('pixels')
 
 
 
-%Ahora me quedo con la parte de la PSF que no sobrepase la microlente. Esto
-%es solo para pintar
-x=(length(PSF{1})/2)-radioMLpxs;%Regla de tres para encontrar la region central de la PSF
+%Now, only portion of PSF which does not exceed the area of each microlense is taken into account. This is only for painting purposes
+x=(length(PSF{1})/2)-radioMLpxs;% Find the central area of each microlense.
 for i=1:length(PSF)
     PSF{i}=PSF{i}(x:end-x-1,x:end-x-1);
 end
@@ -36,9 +39,9 @@ end
 
 subplot(1,2,2)
 imshow(BackGround.*pupilpintar,[])
-title('Imagen en la CCD (respetando region de cada microlente). El punto rojo marca el centroide de referencia') 
-xlabel('pixeles')
-ylabel('pixeles')
+title('Image in the CCD (the area of each microlenses is respected). The red point is the reference centroid') 
+xlabel('pixels')
+ylabel('pixels')
 hold on
 for i=1:length(PSF)
     rectangle('Position', [CoorBuenas(i,1) CoorBuenas(i,3) radioMLpxs*2 radioMLpxs*2],'LineWidth', 0.1, 'EdgeColor', 'b');
