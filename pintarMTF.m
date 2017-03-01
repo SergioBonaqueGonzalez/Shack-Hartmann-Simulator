@@ -1,17 +1,19 @@
 function pintarMTF(M,L,LAMBDA,MTFOrig,MTFRec,MTFRes)
+%Created by Sergio Bonaque-Gonzalez. Optical Engineer.
+%   sergio.bonaque@um.es
+% This function paints some MTF images.
 
-%%PINTADO Y ESCALADO DE LA MTF
-porcion = M/(L/2);%pixeles que corresponden a la funcion pupila
+porcion = M/(L/2);%pixels of the pupil function
 cutofffull = (0.95*2)/(LAMBDA/1000)/57.3;
 cutoffaper = (0.95*2)/(LAMBDA/1000)/57.3;
 halfsize = ceil(0.5*(cutoffaper/cutofffull)*porcion);
 cutoff=cutofffull/2;
 
-% definicion ejes en ciclos/grado
+% definition in cycles/degrees
 n = size(MTFOrig);
 axisMTF = -cutoff:2*cutoff/n(1):(cutoff-(2*cutoff/n(1)));
 
-%MTF radial
+%radially averaged MTF 
 [sizMTFOrig, ~] = size(MTFOrig);
 [~, peakyOrig]=max(max(MTFOrig));
 [~, peakxOrig]=max(max(transpose(MTFOrig)));
@@ -96,6 +98,6 @@ plot(axisradMTFOrig,radialMTFOrig,axisradMTFRec,radialMTFRec,axisradMTFRes,radia
 title('radial average MTF');
 xlabel('c/deg');
 ylabel('Radial Modulation Transfert Function');
-legend('Original','recuperada','Residuo')
+legend('Original','Recovered','Residual')
 
 drawnow();
