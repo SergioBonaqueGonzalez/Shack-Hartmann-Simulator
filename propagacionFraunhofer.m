@@ -1,23 +1,30 @@
 function[u2,L2]=propagacionFraunhofer(u1,L1,lambda,z,contador)
-% propagacion en campo lejano en el regimen de Fraunhofer. Asume un muestreo uniforme. 
-% u1 - Campo fuente/origen
-% L1 - Longitud del lado del campo fuente
-% lambda - longitud de onda en metros
-% z - distancia de propagacion en metros
-% L2 - Longitud del lado del campo observado 
-% u2 - campo observado
+%Created by Sergio Bonaque-Gonzalez. Optical Engineer.
+%   sergio.bonaque@um.es
+% This function calculates the propagation in the Fraunhofer region. A uniform sampling is supossed. 
 
-[M,~]=size(u1);           %Obtiene las dimensiones del campo fuente
-dx1=L1/M;                 %Intervalo de muestreo
+%INPUTS:
+% u1 - Origin field
+% L1 - Length of the side of the source 
+% lambda - wavelength in meters
+% z - propagation distance in meters. 
+%contador= dummy variable which indicates if a message should be showed or not
+
+%OUTPUTS:
+% L2 - Length of the side of the observed field.  
+% u2 - observed field
+
+[M,~]=size(u1);           
+dx1=L1/M;                 %Sampling intervale
 k=2*pi/lambda;            
 
-L2=lambda*z/dx1;          % L2 - Longitud del lado del campo observado 
-dx2=lambda*z/L1;          %intervalo del muestreo en el campo observado
-x2=-L2/2:dx2:L2/2-dx2;    %coordenadas en el campo observado
+L2=lambda*z/dx1;          
+dx2=lambda*z/L1;          
+x2=-L2/2:dx2:L2/2-dx2;    
 
 
-if contador==0; %Para que solo lo muestre la primera vez;
-    disp('Propagacion en regimen de Fresnel OK!');
+if contador==0; %It is only showed the first time
+    disp('Propagation in Fresnel regime was succesful!');
 end
 
 [X2,Y2]=meshgrid(x2,x2); 
