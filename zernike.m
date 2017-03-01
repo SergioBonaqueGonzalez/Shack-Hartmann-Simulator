@@ -1,4 +1,7 @@
 function zz = zernike(j, dim)
+%Created by Sergio Bonaque-Gonzalez. Optical Engineer.
+%   sergio.bonaque@um.es
+% This function creates Zernike Coefficients.  
 
     temp = zeros(dim, dim);
     xx   = zeros(dim, dim);
@@ -17,7 +20,6 @@ function zz = zernike(j, dim)
     teta   = atan2(yy, xx);
     [n, m] = indice(j);
 
-%     mask = anular_mask(dim, dim, dim / 2, dim / 2, 0, (dim / 2) - 1);
     mask = mascaraCircular(1,dim);
 
     if (m == 0)
