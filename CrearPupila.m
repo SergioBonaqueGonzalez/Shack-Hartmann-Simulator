@@ -1,29 +1,26 @@
 function [pupil,rho]=CrearPupila(resolucion)
+%Created by Sergio Bonaque-Gonzalez. Optical Engineer.
+%   sergio.bonaque@um.es
+%This function creates a binary circular pupil inside a square matrix of certain size. 
 
-% *************************************************************************
-% ************************CREACION PUPILA *********************************
-% *************************************************************************
-% *************************************************************************
+%INPUTS:
+%resolucion= size of the square matrix where the pupil will be inscribed.
 
-%Creacion pupila circular inicial para poder definir zernikes dentro
+%OUTPUTS:
+%pupil= a binary circular pupil (inside=1, outside=0) inscribed in the requested matrix size.
+%rho= having the pupil a radius of 1, rho is a matrix with the hypotenuse values of each pixel. 
+
 xp=linspace(-1,1,resolucion); 
-[X,Y]=meshgrid (xp,xp); %Meshgrid crea una matriz cuyas filas son copias del vector xp, y cuyas columnas son copias del vector xp
-[rho]=sqrt(X.^2+Y.^2); %hipotenusa. Matriz que sustituye cada valor por el de su hipotenusa con respecto a su posicion
+[X,Y]=meshgrid (xp,xp); 
+[rho]=sqrt(X.^2+Y.^2); 
 
 
 pupil=ones(size(rho));
 [a,b]=size(rho); 
 for i=(1:a);
     for j=(1:b);
-        if rho(i,j) > 1 ;%Este es el valor del radio del circulo unidad donde van a estar definidos los zernikes.
+        if rho(i,j) > 1 ;% Defining a circle of radius 1. 
             pupil(i,j)=0;
         end;
     end;
 end;
-
-%                                         imagesc(Coordenadas,Coordenadas,pupil);%
-%                                         title('Pupila Inicial') 
-%                                         set(gcf,'color','w');
-%                                         xlabel('metros')
-%                                         ylabel('metros')
-
