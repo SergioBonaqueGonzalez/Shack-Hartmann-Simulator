@@ -115,7 +115,15 @@ The size of the pupil is 0.00075 meters
 Elapsed time is 29.992629 seconds.
 
 
-
+![My image1](/imgs/figure1.jpg)   
+![My image2](/imgs/figure2.jpg)  
+![My image3](/imgs/figure3.jpg)  
+![My image4](/imgs/figure4.jpg)  
+![My image5](/imgs/figure5.jpg)  
+![My image6](/imgs/figure6.jpg)  
+![My image7](/imgs/figure7.jpg)  
+![My image8](/imgs/figure8.jpg)  
+![My image9](/imgs/figure9.jpg)  
 
 
 
