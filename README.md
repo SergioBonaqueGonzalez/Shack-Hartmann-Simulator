@@ -80,6 +80,7 @@ where:
 
 
 Example of use:
+It will run the simulator for a phase defined by 36 zernike modes. The CCD has 413x413 pixels with a pixel size of 1.471e-6. The wavelength is 0.780 microns. The microlenses array is 15x15. The focal of each microlent is 1e-3 meters. Propagation between microlenses and CCD will be not considered. Each Zernike will be characterized with a value of 1e-8 meters. The CCD has 16 bits and all outputs will be painted.
 
 modos=36;
 
@@ -87,7 +88,7 @@ c(1:15)=rand(15,1);
 
 c(16:modos)=0.1*rand(length(16:modos),1);
 
-[ZerRecuperados]=SimAb(modos,c,513,1.471e-6,0.780,39,1e-3,0,1e-8,16,1);
+[ZerRecuperados]=SimAb(modos,c,413,1.471e-6,0.780,15,1e-3,0,1e-8,16,1);
 
 Zernike matrix not available. Calculating...
 
@@ -112,6 +113,7 @@ Difference between the RMS of the incoming phase (1.93317) and the recovered one
 The size of the pupil is 0.00075 meters
 
 Elapsed time is 29.992629 seconds.
+
 
 
 
