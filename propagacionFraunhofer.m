@@ -24,7 +24,7 @@ x2=-L2/2:dx2:L2/2-dx2;
 
 
 if contador==0; %It is only showed the first time
-    disp('Propagation in Fresnel regime was succesful!');
+    disp('Propagation in Fraunhofer regime was succesful!');
 end
 
 [X2,Y2]=meshgrid(x2,x2); 
