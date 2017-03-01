@@ -1,4 +1,7 @@
 function [ngra mazi] = indice(jfin)
+%Created by Sergio Bonaque-Gonzalez. Optical Engineer.
+%   sergio.bonaque@um.es
+% This is an auxiliary function for compute Zernike coefficients.
 
     n_gra = zeros(1, jfin + 10);
     m_azi = zeros(1, jfin + 10);
