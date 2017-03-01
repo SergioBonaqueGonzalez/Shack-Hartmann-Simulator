@@ -1,7 +1,7 @@
 # Shack-Hartmann-Simulator in MATLAB
 
 
-This program was created by Sergio Bonaque-Gonzalez
+This program was created by Sergio Bonaque-Gonzalez, Optical Engineer.
 
 sergio.bonaque@um.es
 
@@ -12,9 +12,9 @@ I am open to include any request or any contribution.
 
 
 - The input is a phase represented as a vector of zernike coefficients in the Noll notation 
-- The output is a vector of recovered Zernike coefficients 
+- The output is a vector of recovered Zernike coefficients through an almost ideal Shack-Hartmann sensor.
 
-In its actual state, it can be used, for example, to test centroid algorithms or new methodology.I hope in the near future will be a very complete simulator.
+In its actual state, it can be used, for example, to test centroid algorithms or new methodology. I hope in the near future will be a very complete simulator.
 At the moment it is a shack-Hartmann simulator which includes the following features;
 Customization of:
 
@@ -43,10 +43,9 @@ First, it will calculate and store the recuperation matrix for a certain configu
 
 To Do:
 - I like to program in a very easy-to-understand way. However it is not computationally optimal.
-- The script is very commented but in Spanish. If someone is very interested and wants to improve it, a further translation to english is possible.
 - Noise it is not considered, but it will be included in the near future.
 - The centroid estimation algorithm is basically the one from MATLAB. If noise it is include, the algorithm of centroid estimation should also be improved.
-- For testing purposes, in this moment the script only allows to use configurations of pixel and number of microlenses which allow a simmetric distribution of microlesenses and pupil. Now it can be removed, but it is something to do.
+- For testing purposes, in this moment the script only allows to use configurations of pixel and number of microlenses which allow a simmetric distribution of microlesenses and pupil (odd resolution). Now it can be removed, but it is something to do.
 - Include separation between microlenses
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -88,4 +87,9 @@ c(1:15)=rand(15,1);
 
 c(16:modos)=0.1*rand(length(16:modos),1);
 
-[ZerRecuperados]=SimAb(modos,c,2025,1.471e-6,0.780,41,1e-3,0,1e-8,16,0);
+[ZerRecuperados]=SimAb(modos,c,1025,1.471e-6,0.780,41,1e-3,0,1e-8,16,0);
+
+
+
+
+
