@@ -87,7 +87,33 @@ c(1:15)=rand(15,1);
 
 c(16:modos)=0.1*rand(length(16:modos),1);
 
-[ZerRecuperados]=SimAb(modos,c,1025,1.471e-6,0.780,41,1e-3,0,1e-8,16,0);
+[ZerRecuperados]=SimAb(modos,c,513,1.471e-6,0.780,39,1e-3,0,1e-8,16,1);
+
+Zernike matrix not available. Calculating...
+
+Sampling of microlenses is good enough.
+
+Propagation between microlenses and CCD is not considered
+
+Calculations performed for 16 bits. 
+
+Zernike vector is not available. Calculating new Zernike vector...
+
+Starting parallel pool (parpool) using the 'local' profile ... connected to 4 workers.
+
+lsqr converged at iteration 57 to a solution with relative residual 0.034.
+
+Strhel ratio of residual = 0.91709
+
+Difference between Strhel ratio of the incoming phase and the recovered one is -0.00019
+
+Difference between the RMS of the incoming phase (1.93317) and the recovered one (1.90105) is = 0.04848 (1.66 of error in percentage).
+
+The size of the pupil is 0.00075 meters
+
+Elapsed time is 29.992629 seconds.
+
+
 
 
 
