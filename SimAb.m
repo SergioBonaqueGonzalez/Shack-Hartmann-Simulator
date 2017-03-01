@@ -322,36 +322,20 @@ end
                                                 drawnow();
                                             end
 
-%Todo centroide que esté por fuera de cada microlente está invadiendo la
-%microlente contigua. En nuestro simulador la solucion es mejor que en la
-%realidad ya que al calcular la PSF y el centroide de la misma
-%individualmente y sobre un area mayor no tenemos este problema. En la
-%realidad esto es un problema de los sensores de Shack-Hartmann que no
-%tendremos con el nuestro. Aun así, vamos a simular una situación ideal
-%donde tenemos un algoritmo capaz de identificar que PSF viene de cada
-%microlente.
+%If a centroid exceed the area of the CCD "asigned" to its microlent, it is a problem when calculating. Here, we are simulating an ideal Shack-Hartmann, able to find out where each PSF comes from.
+
 
 % *************************************************************************
-% ***********CALCULO DE LA PENDIENTE***************************************
+% ***********SLOPE CALCULATION***************************************
 %**************************************************************************
 % *************************************************************************  
-%Calculo los deltas en la posicion del centroide en cada microlente en
-%metros
-deltas=double(LongitudCentroide*TamPixel); %Estos deltas estan muy discretizados segun el número de pixeles.
+deltas=double(LongitudCentroide*TamPixel); 
 
-%Calculo el alfa en cada microlente
 alfax= double(atan(deltas(:,1)/focalML));
 alfay=double(atan(deltas(:,2)/focalML));
 
-% %pongo cada alfa en su lugar de la matriz inicial
-% solucionbipre(1:length(solucionx),1)=solucionx;
-% solucionbipre(length(solucionx)+1:length(soluciony)*2,1)=soluciony;
-
-
-
 solucionx=Eliminadas;
 soluciony=Eliminadas;
-
 
 contador=1;
 for i=1:length(Eliminadas)
@@ -363,9 +347,9 @@ for i=1:length(Eliminadas)
 end
 
       
-                                             %Para pintar
+                                             %Painting
                                             if pintar==1
-                                                % %Construyo las matrices de pendientes
+                                                % Building a slopes matrix
                                                 solucionxvec=vec2mat(solucionx',sqrt(length(Eliminadas)));
                                                 solucionyvec=vec2mat(soluciony',sqrt(length(Eliminadas)));
                                                 solucionx2=solucionxvec;
@@ -382,16 +366,16 @@ end
                                                 end
 
                                                 figure
-                                                suptitle('Pendientes del frente de onda recuperadas')
+                                                suptitle('Slope or the recovered phase')
                                                 subplot(1,2,1)
                                                 set(gcf,'color','w');
                                                 imshow(solucionx2,[])
-                                                title('Eje x') 
+                                                title('x-axis') 
                                                 colorbar
 
                                                 subplot(1,2,2)
                                                 imshow(soluciony2,[])
-                                                title('Eje y') 
+                                                title('y-axis') 
                                                 colorbar
                                                 drawnow();
 
@@ -399,7 +383,7 @@ end
                                                 clear soluciony2
                                             end
 
-%Las junto en un vector. 
+%Joining together in a vector
 solucionbi=zeros(length(solucionx)*2,1);
 solucionbi(1:length(solucionx),1)=solucionx;
 solucionbi(length(solucionx)+1:length(soluciony)*2,1)=soluciony;
@@ -407,46 +391,31 @@ solucionbi(length(solucionx)+1:length(soluciony)*2,1)=soluciony;
                                             
 
 % *************************************************************************
-% ***********RECUPERACION DE LOS ZERNIKES**********************************
+% ***********ZERNIKE RECOVERING**********************************
 %**************************************************************************
 % *************************************************************************  
-%El numero mas alto de Zernikes que pueden ser usados en la recuperacion
-%está limitado por el numero de microlentes en una direccion. Esto
-%significa que si tenemos 30x30 microlentes, no deberiamos exceder el modo 900, en caso contrario el sistema estará sobredeterminado.
+%For phase recovering I will use lineal estimation without ligatures,
+%using the modal estimation case:"Wavefront Optics for Vision Correction", Guang-ming Dai.
 
-%Si quisiera sacar la pendiente del frente de onda original
-%[WX,WY] = gradient(W,TamPixel); %Aparece el problema de los bordes y
-%habria que quitarlos para verlo bien
-% pendiente = sqrt(WX.^2 + WY.^2);
-  
-%Para la recuperacion de la fase voy a utilizar estimacion lineal sin ligaduras,
-%utilizando la variante de estimacion modal. Se basa en la estimación de la aberracion de onda mediante la estimación de los coeficientes modales del desarrollo de la aberración en una base de polinomios ortogonales
-%Un buen libro es este: "Wavefront Optics for Vision Correction", Escrito por Guang-ming Dai.
-%"https://books.google.es/books?id=aCC-IciqKkYC&pg=PA123&lpg=PA123&dq=matlab+wave+front+derivatives&source=bl&ots=5tSBxQAEbN&sig=ToS1Ns-zQSb6q43NsA02nA513Os&hl=es&sa=X&ved=0ahUKEwiO8fSHkYPRAhUBXRoKHUdQDMwQ6AEINzAD#v=onepage&q=matlab%20wave%20front%20derivatives&f=false"
-
-
-
-
-% ****************CREA EL VECTOR DE ZERNIKES PARA COMPARAR*****************
-%Como este proceso tarda mucho, primero se comprueba si ya existe la estructura con las caracteristicas del sensor que se hayan puesto, sino existen si se
-%crean
+% ****************CALCULATES A VECTOR OF ZERNIKE COEFFICIENTS FOR COMPARATION PURPOSES*****************
+% First, it is checked if such vector already exist with the actual configuration
 
 if exist ('VectorZernikes.mat','file') ~=0
     est=load ('VectorZernikes.mat');
     configpre=est.configuracion;
     clear est
     if configpre.resolucion==resolucion && configpre.TamPixel==TamPixel && configpre.focalML == focalML && configpre.Propagacion==Propagacion && configpre.lambda==lambda && configpre.NLentes == NLentes(1) && configpre.modos==modos && configpre.Escala==Escala && configpre.factor==factor && configpre.bits==bits
-        fprintf ('Vector de zernikes ya creado para esta configuracion de shack-hartmann.\n')
+        fprintf ('Zernike vector already exists for this configuration.\n')
         VectorZernikes=configpre.VectorZernikes;
     else
         delete('VectorZernikes.mat');
-        fprintf ('Se ha modificado la configuracion.Calculando vector de zernikes...\n')
+        fprintf ('Configuration was modified. Calculating new vector of Zernikes...\n')
         [VectorZernikes] = ObtenerMatrizZernikes(TamPixel,focalML,Propagacion,lambda,k,MicroLentesMascara,radioMLpxs,CoorBuenas,PupilaML,NFresnel,CentroideReferencia,Escala,modos,ZerModo,Eliminadas,length(solucionbi),factor,bits);
         configuracion = struct('resolucion',resolucion,'TamPixel',TamPixel,'focalML',focalML,'Propagacion',Propagacion,'lambda',lambda,'NLentes',NLentes(1),'modos',modos,'VectorZernikes',VectorZernikes,'Escala',Escala,'factor',factor,'bits',bits);%#ok<NASGU>
         save('VectorZernikes.mat', 'configuracion')
     end
 else
-    fprintf('Vector de zernikes no disponible.Calculando vector de zernikes...\n')
+    fprintf('Zernike vector is not available. Calculating new Zernike vector...\n')
     [VectorZernikes] = ObtenerMatrizZernikes(TamPixel,focalML,Propagacion,lambda,k,MicroLentesMascara,radioMLpxs,CoorBuenas,PupilaML,NFresnel,CentroideReferencia,Escala,modos,ZerModo,Eliminadas,length(solucionbi),factor,bits);
     configuracion = struct('resolucion',resolucion,'TamPixel',TamPixel,'focalML',focalML,'Propagacion',Propagacion,'lambda',lambda,'NLentes',NLentes(1),'modos',modos,'VectorZernikes',VectorZernikes,'Escala',Escala,'factor',factor,'bits',bits);%#ok<NASGU>                                 
     save('VectorZernikes.mat', 'configuracion')
@@ -454,12 +423,11 @@ end
 
 clear configuracion
 
-%Recuperacion por mínimos cuadrados. Es equivalente a construir la matriz
-%de recuperacion
+%Recovering is made by mean of least square method. It is equivalent to construct the recovering matrix.
 ZerRecuperados = lsqr((VectorZernikes(:,1:modos)*1e-6)/factor,solucionbi,1e-10,500);
 
 
-%frente de onda recuperado
+%Recovered wavefront
 ZSUMARec=zeros(length(ZerModo{1}));
 for i=4:modos
     ZMODORec=ZerRecuperados(i)*ZerModo{i};
@@ -469,7 +437,7 @@ end
 
                                                 pintarWFs(W,ZSUMARec.*1e-6,pupilpintar);
                                                 
-%Voy a poner un borde alrededor de la pupila para hacer la psf
+%Pupil is enlarged when calculating PSF for avoid borders effects
 ZTOTALRec=zeros(resolucion*2+1);
 ZTOTALPad=ZTOTALRec;
 pupilPad=ZTOTALRec;
@@ -478,20 +446,18 @@ ZTOTALPad((resolucion/2)+1.5:end-(resolucion/2)-0.5,(resolucion/2)+1.5:end-(reso
 pupilPad((resolucion/2)+1.5:end-(resolucion/2)-0.5,(resolucion/2)+1.5:end-(resolucion/2)-0.5)=pupil;
 
 
-WRec=ZTOTALRec.*1e-6;%paso a metros
-WPad=ZTOTALPad.*1e-6;%paso a metros
+WRec=ZTOTALRec.*1e-6;%conversion to meters.
+WPad=ZTOTALPad.*1e-6;
                       
 
 % *************************************************************************
-% ***********ANALISIS DEL RESIDUO******************************************
+% ***********RESIDUAL ANALYSIS********************************************
 %**************************************************************************
 % *************************************************************************                                            
-%MATRIZ DE ACOPLAMIENTO. Pagina 69 tesis de Justo Arines
-%B es la matriz matriz de deviradas de Zernikes evaluadas en los puntos de medida pero con el numero de Zernikes que tiene el haz incidente
-%AA=inv((transpose(VectorZernikes)*VectorZernikes))*transpose(VectorZernikes)*B;
+%A good book for residual theory is the thesis dissertation of Justo Arines
 Residuo=pupilPad.*(WPad-WRec);
 
-%Funcion pupila
+%Pupil function
 PFOrig = pupilPad.*exp(sqrt(-1)*k.*WPad);
 PFRec = pupilPad.*exp(sqrt(-1)*k*WRec);
 PFDif=pupilPad.*exp(sqrt(-1)*k*(WRec*0));
@@ -500,23 +466,23 @@ PFRes=pupilPad.*exp(sqrt(-1)*k*Residuo);
 %PSF
 PSFOrig=fft2(PFOrig); %Two-dimensional discrete Fourier Transform.
 clear PFOrig;
-PSFOrig=fftshift(PSFOrig);% Esto sería la amplitud compleja de la PSF. Sacado de la ayuda de MATLAB: FFTSHIFT is useful for visualizing the Fourier transform with the zero-frequency component in the middle of the spectrum.
-PSFOrig=PSFOrig.*conj(PSFOrig);%Esto ya es el modulo de la PSF
+PSFOrig=fftshift(PSFOrig);
+PSFOrig=PSFOrig.*conj(PSFOrig);
 
 PSFRec=fft2(PFRec); %Two-dimensional discrete Fourier Transform.
 clear PFRec;
-PSFRec=fftshift(PSFRec);% Esto sería la amplitud compleja de la PSF. Sacado de la ayuda de MATLAB: FFTSHIFT is useful for visualizing the Fourier transform with the zero-frequency component in the middle of the spectrum.
-PSFRec=PSFRec.*conj(PSFRec);%Esto ya es el modulo de la PSF
+PSFRec=fftshift(PSFRec);
+PSFRec=PSFRec.*conj(PSFRec);
 
 PSFDif=fft2(PFDif); %Two-dimensional discrete Fourier Transform.
 clear PFDif;
-PSFDif=fftshift(PSFDif);% Esto sería la amplitud compleja de la PSF. Sacado de la ayuda de MATLAB: FFTSHIFT is useful for visualizing the Fourier transform with the zero-frequency component in the middle of the spectrum.
-PSFDif=PSFDif.*conj(PSFDif);%Esto ya es el modulo de la PSF
+PSFDif=fftshift(PSFDif);
+PSFDif=PSFDif.*conj(PSFDif);
 
 PSFRes=fft2(PFRes); %Two-dimensional discrete Fourier Transform.
 clear PFRes;
-PSFRes=fftshift(PSFRes);% Esto sería la amplitud compleja de la PSF. Sacado de la ayuda de MATLAB: FFTSHIFT is useful for visualizing the Fourier transform with the zero-frequency component in the middle of the spectrum.
-PSFRes=PSFRes.*conj(PSFRes);%Esto ya es el modulo de la PSF
+PSFRes=fftshift(PSFRes);
+PSFRes=PSFRes.*conj(PSFRes);
 
                                             if pintar==1
                                                 pintaPSF(PSFOrig,PSFRec,PSFRes)
@@ -525,49 +491,43 @@ PSFRes=PSFRes.*conj(PSFRes);%Esto ya es el modulo de la PSF
                                            
 
 
-%OTF Y MTF 
-OTFOrig=fft2(PSFOrig);%primero calculo la OTF, no hace falta normalizar porque la PSF ya esta normalizada. Esta OTF no esta centrada
-MTFOrig = abs(OTFOrig); % MTF es la magnitud (abs) de la OTF
-MTFOrig=fftshift(MTFOrig); %centro la MTF
-MTFOrig = MTFOrig./max(max(MTFOrig)); % Escalo la MTF para que el pico sea 1
+%OTF & MTF 
+OTFOrig=fft2(PSFOrig);%OTF 
+MTFOrig = abs(OTFOrig); 
+MTFOrig=fftshift(MTFOrig); 
+MTFOrig = MTFOrig./max(max(MTFOrig)); 
 
-OTFRec=fft2(PSFRec);%primero calculo la OTF, no hace falta normalizar porque la PSF ya esta normalizada. Esta OTF no esta centrada
-MTFRec = abs(OTFRec); % MTF es la magnitud (abs) de la OTF
-MTFRec=fftshift(MTFRec); %centro la MTF
-MTFRec = MTFRec./max(max(MTFRec)); % Escalo la MTF para que el pico sea 1
+OTFRec=fft2(PSFRec);
+MTFRec = abs(OTFRec); 
+MTFRec=fftshift(MTFRec); 
+MTFRec = MTFRec./max(max(MTFRec)); 
 
-OTFRes=fft2(PSFRes);%primero calculo la OTF, no hace falta normalizar porque la PSF ya esta normalizada. Esta OTF no esta centrada
-MTFRes = abs(OTFRes); % MTF es la magnitud (abs) de la OTF
-MTFRes=fftshift(MTFRes); %centro la MTF
-MTFRes = MTFRes./max(max(MTFRes)); % Escalo la MTF para que el pico sea 1
-                                            
+OTFRes=fft2(PSFRes);
+MTFRes = abs(OTFRes); 
+MTFRes=fftshift(MTFRes); 
+MTFRes = MTFRes./max(max(MTFRes)); 
+
                                             if pintar==1
                                                 pintarMTF(resolucion*2+1,resolucion,LAMBDA,MTFOrig,MTFRec,MTFRes)
                                             end
 
 
 % *************************************************************************
-% *************** METRICAS DE CALIDAD**************************************
+% *************** QUALITY METRICS**************************************
 % *************************************************************************
-%Para discernir si la calidad el ajuste es buena obtenemos el residuo (fase
-%original - fase recuperada). A este residuo le impondremos una razon de
-%strhel superior o igual a 0.8 para considerar que se ha recuperado bien.
-%Inferior a 0.8 indicaria que se ha recuperado mal.
 StRes=max(max(PSFRes))/max(max(PSFDif));
-fprintf('La razon de Strhel del residuo es %2.5f\n',StRes);
+fprintf('Strhel ratio of residual = %2.5f\n',StRes);
 
 
-%Otra opcion sería obtener la razon de sthrel de la fase original y luego
-%la de la fase recuperada y normalizar a la de la fase original
 StOrig=max(max(PSFOrig))/max(max(PSFDif));
 StRec=max(max(PSFRec))/max(max(PSFDif));
-fprintf('La diferencia entre la razon de Strhel del frente de onda original y el recuperado es %2.5f\n',StOrig-StRec);
+fprintf('Difference between Strhel ratio of the incoming phase and the recovered one is %2.5f\n',StOrig-StRec);
 
 RMSOrig=sqrt(sum(c(4:length(c)).^2));
 RMSRec=sqrt(sum(ZerRecuperados(4:length(ZerRecuperados)).^2));
 RMSResta=sqrt(sum(abs(c(4:length(c))-ZerRecuperados(4:length(ZerRecuperados))).^2));
-fprintf('La diferencia entre RMS del frente de onda original (%2.5f) y el recuperado (%2.5f) es = %2.5f (%2.2f de error en porcentaje).\n',RMSOrig,RMSRec,RMSResta,100-(RMSRec*100/RMSOrig));
-fprintf('El tamaño de la pupila es %2.5f metros\n',TamanoSensor);
+fprintf('Difference between the RMS of the incoming phase (%2.5f) and the recovered one (%2.5f) is = %2.5f (%2.2f of error in percentage).\n',RMSOrig,RMSRec,RMSResta,100-(RMSRec*100/RMSOrig));
+fprintf('The size of the pupil is %2.5f meters\n',TamanoSensor);
 
 
 
@@ -576,10 +536,10 @@ fprintf('El tamaño de la pupila es %2.5f metros\n',TamanoSensor);
                                             hold on
                                             plot(4:modos,ZerRecuperados(4:modos))
                                             set(gcf,'color','w');
-                                            legend('Original','recuperado');
-                                            xlabel('Modo de Zernike')
-                                            ylabel('Valor en micras')
-                                            title('Zernikes originales vs recuperados')
+                                            legend('Original','Recovered');
+                                            xlabel('Zernike mode')
+                                            ylabel('Value in microns')
+                                            title('Original Zernike coefficient Vs Recovered')
                                             drawnow();
 
 toc    
