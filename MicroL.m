@@ -1,18 +1,31 @@
 function [MicroLentesMascara,radioML,CoorBuenas,Eliminadas]=MicroL(NLentes,resolucion,SeparacionML,pupila,pupilpintar,W,pintar)
+%Created by Sergio Bonaque-Gonzalez. Optical Engineer.
+%   sergio.bonaque@um.es
+% This function calculates a microlenses array. It is supposed a square detector and no separation between microlenses.
 
-%Funcion de matlab que dibuja microlentes. Se supone que el detector es
-%cuadrado y que hay un espacio 0 entre microlentes
+%INPUTS:
+%NLentes= number of microlenses in a row.
+%Resolucion = number o pixels of the detector
+%SeparacionML =  Separation between microlenses. IN THIS MOMENT THIS FEATURE IT IS NOT IMPLEMENTED
+%pupila = pupil of the whole system.
+%pupilpintar = a dummy pupil with NaN instead of zeros. It is created automatically in a previous script. It is useful for visualization purposes.
+%W = Matrix which contains the incoming wavefront.
+%pintar = flag that indicates if figures should be painted or not.
 
-%MicroLentesMascara= mascara con las microlentes
-%x11,y11,x22,y22= valores donde se localizan las esquinas superiores izquierdas de
-%cada microlente
-%AnchoCirculoPequeno= Diametro en pixeles de cada microlente
-Fuera = 0; %Valor fuera de los circulo
-espaciado=floor((SeparacionML/2)+resolucion/NLentes(1)); %Esto es los pixeles de la CCD asignados a cada microlente
+%OUTPUTS
+%MicroLentesMascara= binary mask which contains the microlenses mask.
+%radioML= Radius of each microlense in pixels.
+%CoorBuenas= Coordinates of the upper left corner of each valid microlense. A valid microlense is the one which is completely inside the whole pupil of the system.
+%Eliminadas = Coordinates of the upper left corner of each invalid microlense. For example, discarded microlenses because they are incomplete.
+
+
+Fuera = 0; %Assigned value for pixels outside microlenses 
+espaciado=floor((SeparacionML/2)+resolucion/NLentes(1)); %Assigned pixels for each microlense.
 Resto=resolucion-NLentes(1)*espaciado;
 
+%For testing purposes, i needed a symmetrical disposition of the microlenses array with respect the incoming wavefront:
 if  rem(Resto,2)~=0
-    error('Error.La resolucion actual no permite una disposicion simetrica de las microlentes. Pruebe a aumentar o disminuir en uno el numero de microlentes o a cambiar la resolucion.')
+    error('Error.Actual resolution does not allow a symmetric disposition of microlenses array. Try to increase or diminish the number of microleneses in a row.')
 end
 
 if Resto<0
@@ -21,42 +34,39 @@ end
 
 radioML=espaciado/2;
 if  rem(espaciado,2)==0
-    error('Error.El radio de las microlentes resultantes no permite una configuracion simetrica.Pruebe a aumentar o disminuir en uno el numero de microlentes.')
+    error('Error.The radius of microlenses does not allow a symmetric disposition of microlenses array. Try to increase or diminish the number of microleneses in a row.')
 end
 
 
-% Crea la pupila de cada microlente
+% Here, the pupil of each microlense will be created.
 xp=linspace(-1,1,espaciado);
-
 CirculoPequeno = ones(espaciado, espaciado);
-[X,Y]=meshgrid (xp,xp); %Meshgrid crea una matriz cuyas filas son copias del vector xp, y cuyas columnas son copias del vector xp
-[rho]=sqrt(X.^2+Y.^2); %hipotenusa. Matriz que sustituye cada valor por el de su hipotenusa con respecto a su posicion
+[X,Y]=meshgrid (xp,xp); 
+[rho]=sqrt(X.^2+Y.^2); 
 [a,b]=size(rho); 
 for i=(1:a);
     for j=(1:b);
-        if rho(i,j) > 1 ;%Este es el valor del radio del circulo unidad donde van a estar definidos los zernikes.
+        if rho(i,j) > 1 ;
             CirculoPequeno(i,j)=0;
         end;
     end;
 end;
 
 
-% Voy a definir la esquina superior izquierda donde va alojado el cuadrado que encierra cada circulo
-secuenciax=(Resto/2)+1:espaciado:resolucion-espaciado+1; %En el otro eje es igual al trabajar con matrices cuadradas
-
-
+% the upper left corner of the square where each microlense is inscribed is defined .
+secuenciax=(Resto/2)+1:espaciado:resolucion-espaciado+1; 
 [p,q] = meshgrid(secuenciax, secuenciax);
 pares = [p(:) q(:)];
 MuchosCirculos = zeros(resolucion, resolucion);
-
 x11=zeros(1,length(pares));
 x22=x11;
 y11=x11;
 y22=x11;
 
-% Creo los circulo uno a uno
+
+% Creating each circle one by one:
 for k = 1 : length(pares)
-        % Encuentra la esquina donde se va emplazar cada circulo
+        % find upper left corner:
         x1 = int16(pares(k,1));
         x11(k)=x1;
         y1 = int16(pares(k,2));
@@ -65,19 +75,15 @@ for k = 1 : length(pares)
         x22(k)=x2;
         y2 = int16(y1 + espaciado - 1);
         y22(k)=y2;
-        % Añade el circulo pequeño a la imagen inicial.
+        % Adding the tiny pupil
         MuchosCirculos(y1:y2, x1:x2) = MuchosCirculos(y1:y2,x1:x2) + CirculoPequeno;
 end
-% Me aseguro que el valor fuera es cero.
-MuchosCirculos(MuchosCirculos == 0) = Fuera;
+MuchosCirculos(MuchosCirculos == 0) = Fuera;% make sure the value outside pupils is zero.
 
-
-
-% Multiplico la imagen de la pupila con la de las microlenes para quedarme solo con las centrales
+% Multiplication of the main mask and the microlenses mask. 
 MicroLentesMascara = MuchosCirculos.*pupila;
 
-%Defino todos los circulos y veo si estan completos. Si no lo estan se
-%eliminaran
+% Now, only those microlenses which are completely inside the main pupil are selected: 
 CoorBuenas=zeros(1,4);
 Eliminadas=zeros(length(y11),1);
 for i=1:length(x11)
@@ -88,23 +94,25 @@ for i=1:length(x11)
         Eliminadas(i)=1;
     end
 end
-CoorBuenas(1,:)=[]; %La primera linea son todo ceros por la manera que construí estos vectores.
+CoorBuenas(1,:)=[]; %In the way these vectors are constructed, the first line is always zero.
 
+
+%Painting...
 if pintar==1
     subplot(1,3,2)
     imshow(MicroLentesMascara);
-    title('Mascara de Microlentes');
+    title('Microlenses mask');
     set(gcf,'color','w');
-    xlabel('pixeles')
-    ylabel('pixeles')
+    xlabel('pixels')
+    ylabel('pixels')
     colorbar
 
     subplot(1,3,3)
     imshow(pupilpintar.*MicroLentesMascara.*W,[])
-    title('Matriz de Microlentes superpuesta al frente de onda')
+    title('Microlenses mask and incoming wavefront')
     set(gcf,'color','w');
-    xlabel('pixeles')
-    ylabel('pixeles')
+    xlabel('pixels')
+    ylabel('pixels')
     drawnow();
     colorbar
     
