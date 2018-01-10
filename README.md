@@ -15,7 +15,7 @@ We are open to include any request or any contribution.
 - The output is a vector of recovered Zernike coefficients through a realistic Shack-Hartmann sensor.
 
 This simulator is in an advanced state of development. It can be useful in Shack-Hartmann design.
-It includes the followin items:
+It includes the following items:
 
     Resolution of CCD. 
     
