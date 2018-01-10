@@ -3,10 +3,10 @@
 
 This program was created by Sergio Bonaque-Gonzalez, Optical Engineer & Juan Trujillo-Sevilla, Electronic Engineer
 
-sbonaque@wooptix.com    trujillo@wooptix.com
-
+sbonaque@wooptix.com    
 www.linkedin.com/in/sergiobonaque
 
+trujillo@wooptix.com
 
 We are open to include any request or any contribution.
 
