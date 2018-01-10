@@ -184,21 +184,21 @@ where:
 If you run the script directly, you will obtain an example with default values, with the followin outputs:
 
 
-SHsimulator
+	SHsimulator
 
-Function called without values. Using values by defect. Read documentation to include your own values.
+	Function called without values. Using values by defect. Read documentation to include your own values.
 
-Zernike matrix already exists.
+	Zernike matrix already exists.
 
-Calculations performed for 16 bits. 
+	Calculations performed for 16 bits. 
 
-Zernike calibration already exists for this configuration.
+	Zernike calibration already exists for this configuration.
 
-Strhel ratio of residual = 0.12691 (ideal =>0.8)
+	Strhel ratio of residual = 0.12691 (ideal =>0.8)
 
-Difference between Strhel ratio of the incoming phase and the recovered one is -0.00111
+	Difference between Strhel ratio of the incoming phase and the recovered one is -0.00111
 
-Difference between the RMS of the incoming phase (1.98537) and the recovered one (1.75808) is = 0.23083 (11.45 of error in percentage).
+	Difference between the RMS of the incoming phase (1.98537) and the recovered one (1.75808) is = 0.23083 (11.45 of error in percentage).
 
 
 
