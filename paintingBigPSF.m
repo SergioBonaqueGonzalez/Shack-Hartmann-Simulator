@@ -23,10 +23,17 @@ if SH.paint==1 && count ==0
     ylabel('pixels')
 end
 
-BackGround(1:floor(difference/2),:)=[];
-BackGround(end-floor(difference/2)+1:end,:)=[];
-BackGround(:,1:floor(difference/2))=[];
-BackGround(:,end-floor(difference/2)+1:end)=[];
+if mod(difference,2)==0
+    BackGround(1:floor(difference/2),:)=[];
+    BackGround(end-floor(difference/2)+1:end,:)=[];
+    BackGround(:,1:floor(difference/2))=[];
+    BackGround(:,end-floor(difference/2)+1:end)=[];
+else
+    BackGround(1:floor(difference/2),:)=[];
+    BackGround(end-floor(difference/2):end,:)=[];
+    BackGround(:,1:floor(difference/2))=[];
+    BackGround(:,end-floor(difference/2):end)=[];
+end
 
 %Introduction of Photon Noise
 if PhotonNoise==1 && flag==1
