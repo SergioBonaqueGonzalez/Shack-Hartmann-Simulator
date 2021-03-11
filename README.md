@@ -3,7 +3,7 @@
 
 This program was created by Sergio Bonaque-Gonzalez, Optical Engineer & Juan Trujillo-Sevilla, Electronic Engineer
 
-sbonaque@wooptix.com    
+sergio.bonaque.gonzalez@gmail.com
 www.linkedin.com/in/sergiobonaque
 
 trujillo@wooptix.com
